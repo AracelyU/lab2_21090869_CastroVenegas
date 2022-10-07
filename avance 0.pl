@@ -43,9 +43,10 @@ pixrgb_d(CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad,
 % Descripción: Define como es un pixhex_d
 % Dominio: CoordX, CoordY, Hex, Profundidad, Letra
 % Recorrido: pixhex_d
-pixhex_d(CoordX, CoordY, Hex, Profundidad):-
+% comentarios: los string son "", no ''
+pixhex_d(CoordX, CoordY, Hex, Profundidad, [CoordX, CoordY, Hex, Profundidad]):-
     integer(CoordX), CoordX >= 0,
-    integer(coordY), CoordY >= 0,
+    integer(CoordY), CoordY >= 0,
     string(Hex),
     integer(Profundidad), Profundidad >= 0.
 
@@ -61,14 +62,15 @@ image(Ancho, Largo, Pixel, [Ancho, Largo, Pixel]):-
 % Dominio: Lista de pixeles
 % Recorrido: Boleano
 % Tipo de recursión: Cola, llama sin estados pendientes.
-esBitmap([]).
+esBitmap([]):- !, true.
 esBitmap([Cabeza | Cola]):-
-    length(Cabeza, N), N \== 4 -> false;
+    length(Cabeza, N), N == 4,
     pixbit_d(X,_,_,_, Cabeza),
     pixbit_d(_,Y,_,_, Cabeza),
     pixbit_d(_,_,B,_, Cabeza),
     pixbit_d(_,_,_,D, Cabeza),
-    pixbit_d(X,Y,B,D, Cabeza) \== false ->
+    pixbit_d(X,Y,B,D, P),
+    P \== false ->
     esBitmap(Cola);
     false.
 
@@ -78,10 +80,17 @@ esBitmap([Cabeza | Cola]):-
 % Tipo de recusión: Cola, llama sin estados pendientes
 esPixmap([]).
 esPixmap([Cabeza | Cola]):-
-    length(Cabeza, N), N \== 6 -> false;
-        pixrgb_d(_,_,_,_,_,_,Cabeza) \== false ->
-           esPixmap(Cola);
-           false.
+    length(Cabeza, N), N == 6,
+    pixrgb_d(X,_,_,_,_,_, Cabeza),
+    pixrgb_d(_,Y,_,_,_,_, Cabeza),
+    pixrgb_d(_,_,R,_,_,_, Cabeza),
+    pixrgb_d(_,_,_,G,_,_, Cabeza),
+    pixrgb_d(_,_,_,_,B,_, Cabeza),
+    pixrgb_d(_,_,_,_,_,D, Cabeza),
+    pixrgb_d(X,Y,R,G,B,D, P),
+    P \== false ->
+    esPixmap(Cola);
+    false.
 
 % Descripción: Consulta si los pixeles de una imagen son pixhex_d
 % Dominio: Lista de pixeles
@@ -89,12 +98,13 @@ esPixmap([Cabeza | Cola]):-
 % Tipo de recursión: Cola, llama sin estados pendientes
 esHexmap([]).
 esHexmap([Cabeza | Cola]):-
-    length(Cabeza, N), N \== 4 -> false;
+    length(Cabeza, N), N == 4,
     pixhex_d(X,_,_,_, Cabeza),
     pixhex_d(_,Y,_,_, Cabeza),
     pixhex_d(_,_,H,_, Cabeza),
     pixhex_d(_,_,_,D, Cabeza),
-    pixhex_d(X,Y,H,D, Cabeza) \== false ->
+    pixhex_d(X,Y,H,D, P),
+    P \== false ->
     esHexmap(Cola);
     false.
 
@@ -108,7 +118,8 @@ condicional(A):-
 % Dominio: image
 % Recorrido: Boleano
 imageIsBitmap(Imagen):-
-    image(_,_,P, Imagen), esBitmap(P) \== false ->
+    image(_,_,P, Imagen),
+    esBitmap(P) ->
     write('#t');
     write('#f').
 
@@ -116,7 +127,8 @@ imageIsBitmap(Imagen):-
 % Dominio: image
 % Recorrido: Boleano
 imageIsPixmap(Imagen):-
-    image(_,_,P, Imagen), esPixmap(P) \== false ->
+    image(_,_,P, Imagen),
+    esPixmap(P) ->
     write('#t');
     write('#f').
 
@@ -124,7 +136,8 @@ imageIsPixmap(Imagen):-
 % Dominio: image
 % Recorrido: Boleano
 imageIsHexmap(Imagen):-
-    image(_,_,P, Imagen), esHexmap(P) \== false ->
+    image(_,_,P, Imagen),
+    esHexmap(P) ->
     write('#t');
     write('#f').
 
