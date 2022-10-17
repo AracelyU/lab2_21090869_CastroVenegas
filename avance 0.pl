@@ -1,3 +1,5 @@
+
+
 %Dominios -> nombre = {argumentos} = salida
 %image = {Ancho, Largo, Pixeles} = image
 %pixbit-d = {CoordX, CoordY, Bit, Profundidad} = pixbit-d
@@ -21,29 +23,23 @@ image_vacia([]).
 %Descripción: Define como es un pixbit_d
 %Dominio: CoordX, CoordY, Bit, Profundidad, Letra
 %Recorrido: pixbit_d
-pixbit_d(CoordX, CoordY, Bit, Profundidad, [CoordX, CoordY, Bit, Profundidad]):-
-    integer(CoordX),CoordX >= 0, integer(CoordY),CoordY >= 0,
-    integer(Bit),Bit = 0;Bit = 1, integer(Profundidad),Profundidad >= 0.
+pixbit(CoordX, CoordY, Bit, Profundidad, [CoordX, CoordY, Bit, Profundidad]):-
+    integer(CoordX),CoordX >= 0, integer(CoordY),CoordY >= 0, integer(Bit),Bit = 0;Bit = 1, integer(Profundidad),Profundidad >= 0.
 
 % Descripción: Define como es un pixrgb_d
 % Dominio: CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad, Letra
 % Recorrido: pixrgb_d
-pixrgb_d(CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad,
-        [CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad]):-
+pixrgb(CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad, [CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad]):-
     integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0,
-    integer(ColorR), ColorR >= 0; ColorR =< 255,
-    integer(ColorG), ColorG >= 0; ColorG =< 255,
-    integer(ColorB), ColorB >= 0; ColorB =< 255,
-    integer(Profundidad), Profundidad >= 0.
-
+    integer(ColorR), ColorR >= 0; ColorR =< 255, integer(ColorG), ColorG >= 0; ColorG =< 255,
+    integer(ColorB), ColorB >= 0; ColorB =< 255, integer(Profundidad), Profundidad >= 0.
 
 % Descripción: Define como es un pixhex_d
 % Dominio: CoordX, CoordY, Hex, Profundidad, Letra
 % Recorrido: pixhex_d
 % comentarios: los string son "", no ''
-pixhex_d(CoordX, CoordY, Hex, Profundidad, [CoordX, CoordY, Hex, Profundidad]):-
-    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0,
-    string(Hex), integer(Profundidad), Profundidad >= 0.
+pixhex(CoordX, CoordY, Hex, Profundidad, [CoordX, CoordY, Hex, Profundidad]):-
+    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0, string(Hex), integer(Profundidad), Profundidad >= 0.
 
 % Descripción: Define como es una imagen
 % Dominio: Ancho, Largo, Pixeles, Letra
@@ -57,11 +53,8 @@ image(Ancho, Largo, Pixel, [Ancho, Largo, Pixel]):-
 % Tipo de recursión: Cola, llama sin estados pendientes.
 esBitmap([]).
 esBitmap([Cabeza | Cola]):-
-    is_list(Cabeza), length(Cabeza, N), N == 4,
-    pixbit_d(X,Y,B,D, Cabeza), pixbit_d(X,Y,B,D, P),
-    P \== false ->
-    esBitmap(Cola);
-    false.
+    is_list(Cabeza), length(Cabeza, N), N == 4, pixbit(X,Y,B,D, Cabeza), pixbit(X,Y,B,D, P),
+    P \== false -> esBitmap(Cola); false.
 
 % Descripción: Consulta si los pixeles de una imagen son pixrgb_d
 % Dominio: Lista de pixeles
@@ -69,11 +62,8 @@ esBitmap([Cabeza | Cola]):-
 % Tipo de recusión: Cola, llama sin estados pendientes
 esPixmap([]).
 esPixmap([Cabeza | Cola]):-
-    is_list(Cabeza), length(Cabeza, N), N == 6,
-    pixrgb_d(X,Y,R,G,B,D, Cabeza), pixrgb_d(X,Y,R,G,B,D, P),
-    P \== false ->
-    esPixmap(Cola);
-    false.
+    is_list(Cabeza), length(Cabeza, N), N == 6, pixrgb(X,Y,R,G,B,D, Cabeza), pixrgb(X,Y,R,G,B,D, P),
+    P \== false -> esPixmap(Cola); false.
 
 % Descripción: Consulta si los pixeles de una imagen son pixhex_d
 % Dominio: Lista de pixeles
@@ -81,74 +71,46 @@ esPixmap([Cabeza | Cola]):-
 % Tipo de recursión: Cola, llama sin estados pendientes
 esHexmap([]).
 esHexmap([Cabeza | Cola]):-
-    is_list(Cabeza), length(Cabeza, N), N == 4,
-    pixhex_d(X,Y,H,D, Cabeza), pixhex_d(X,Y,H,D, P),
-    P \== false ->
-    esHexmap(Cola);
-    false.
+    is_list(Cabeza), length(Cabeza, N), N == 4, pixhex(X,Y,H,D, Cabeza), pixhex(X,Y,H,D, P),
+    P \== false -> esHexmap(Cola); false.
 
 % Descripción: Predicado que verifica si una imagen es Bitmap
 % Dominio: image
 % Recorrido: Boleano
-imageIsBitmap(Imagen):-
-    image(_,_,P, Imagen),
-    esBitmap(P) ->
-    true;
-    false.
+imageIsBitmap(Imagen):- image(_,_,P, Imagen), esBitmap(P) -> true; false.
 
 % Descripión: Predicado que verifica si una imagen es Pixmap
 % Dominio: image
 % Recorrido: Boleano
-imageIsPixmap(Imagen):-
-    image(_,_,P, Imagen),
-    esPixmap(P) ->
-    true;
-    false.
+imageIsPixmap(Imagen):- image(_,_,P, Imagen), esPixmap(P) -> true; false.
 
 % Descripción: Predicado que verifica si una imagen es Hexmap
 % Dominio: image
 % Recorrido: Boleano
-imageIsHexmap(Imagen):-
-    image(_,_,P, Imagen),
-    esHexmap(P) ->
-    true;
-    false.
+imageIsHexmap(Imagen):- image(_,_,P, Imagen), esHexmap(P) -> true; false.
 
 % Descripción: Predicado que verifica existencia de (x,y) en Pixel
 % Dominio: Pixel, int, int
 % Recorrido: Boleano
 existeCoord(Cabeza, X, Y):-
-    esBitmap([Cabeza]) ->
-        pixbit_d(CoordX, CoordY, _, _, Cabeza), CoordX = X, CoordY = Y  ->
-        true; false
+    esBitmap([Cabeza]) -> pixbit(CoordX, CoordY, _, _, Cabeza), CoordX = X, CoordY = Y  -> true; false
     ;
-    esHexmap([Cabeza]) ->
-         pixhex_d(CoordX, CoordY,_,_, Cabeza), CoordX = X, CoordY = Y ->
-         true; false
+    esHexmap([Cabeza]) -> pixhex(CoordX, CoordY,_,_, Cabeza), CoordX = X, CoordY = Y -> true; false
     ;
-    esPixmap([Cabeza]) ->
-          pixrgb_d(CoordX, CoordY,_,_,_,_, Cabeza), CoordX = X, CoordY = Y ->
-          true; false.
-
+    esPixmap([Cabeza]) -> pixrgb(CoordX, CoordY,_,_,_,_, Cabeza), CoordX = X, CoordY = Y -> true; false.
 
 % Descripción: Predicado que verifica si existe una coordenada (X,Y)
 % especifica en la lista de pixeles de una imagen
 % Dominio: Pixel x entero positivo x entero positivo
 % Recorrido: Boleano
-existeCoordXY([Cabeza | Cola], X, Y):-
-     existeCoord(Cabeza, X, Y) ->
-         true;
-         existeCoordXY(Cola, X, Y).
+existeCoordXY([Cabeza | Cola], X, Y):- existeCoord(Cabeza, X, Y) -> true; existeCoordXY(Cola, X, Y).
 
 % Descripción: Predicado que verifica si es una imagen de un solo tipo
 % de pixel
 % Dominio: imagen
 % Recorrido: Boleano
 esImage(Imagen):-
-    imageIsBitmap(Imagen) -> true;
-    imageIsHexmap(Imagen) -> true;
-    imageIsPixmap(Imagen) -> true;
-    false.
+    imageIsBitmap(Imagen) -> true; imageIsHexmap(Imagen) -> true; imageIsPixmap(Imagen) -> true; false.
 
 
 % Descripción: Predicado que modifica CoordX y CoordY de un Pixel
@@ -156,15 +118,17 @@ esImage(Imagen):-
 % Recorrido: Pixel
 cambiarCoordXY(Pixel,X, Y, P):-
     integer(Y), Y >= 0, integer(X), X >= 0,
-    esBitmap([Pixel]) ->
-        pixbit_d(_,_,B,D, Pixel), pixbit_d(X,Y,B,D, P);
-    esHexmap([Pixel]) ->
-        pixhex_d(_,_,H,D, Pixel), pixhex_d(X,Y,H,D, P);
-    esPixmap([Pixel]) ->
-        pixrgb_d(_,_,R,G,B,D, Pixel), pixrgb_d(X,Y,R,G,B,D, P).
+    esBitmap([Pixel]) -> pixbit(_,_,B,D, Pixel), pixbit(X,Y,B,D, P);
+    esHexmap([Pixel]) -> pixhex(_,_,H,D, Pixel), pixhex(X,Y,H,D, P);
+    esPixmap([Pixel]) -> pixrgb(_,_,R,G,B,D, Pixel), pixrgb(X,Y,R,G,B,D, P).
 
-
-% Descripción: Predicado que modifica CoordX de un pixel
+% Descripción: Predicado que eliminar un tipo de elemento de una lista
+% Dominio: elemento X list X variable. Recorrido: list
+removerElemento(_, [], []).
+removerElemento(Y, [Y|Xs], Zs):-
+          removerElemento(Y, Xs, Zs), !.
+removerElemento(X, [Y|Xs], [Y|Zs]):-
+          removerElemento(X, Xs, Zs).
 
 
 % Descripción: Predicado que voltea los pixeles horizontalmente
@@ -172,19 +136,18 @@ cambiarCoordXY(Pixel,X, Y, P):-
 % Recorrido: list
 flipH_formato(_, [], _, _, _, []).
 flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, Contador, [NuevaCabeza | Cola2]):-
-         existeCoordXY([CabezaC | ColaC], CoordX, Contador) ->
+    existeCoordXY([CabezaC | ColaC], CoordX, Contador) ->
                R is CoordY_final-Contador,
                R1 is Contador+1,
                cambiarCoordXY(Cabeza, CoordX, R, NuevaCabeza),
                flipH_formato([CabezaC | ColaC], Cola, CoordY_final, CoordX, R1, Cola2)
                ;
                (Contador > CoordY_final) ->
-                     R2 is CoordX+1,
-                     flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, R2, 0, Cola2)
-                     ;
-                      R3 is Contador+1,
-                     flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, R3, Cola2).
-
+                    R2 is CoordX+1,
+                    flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, R2, 0, Cola2)
+                    ;
+                    R3 is Contador+1,
+                    flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, R3, Cola2).
 
 
 % Descripción: Predicado que voltea la imagen horizontalmente
@@ -195,10 +158,9 @@ imageFlipH(Imagen, Imagen2):-
     image(CoordX, CoordY, Pixeles, Imagen),
     CoordY_final is CoordY-1,
     flipH_formato(Pixeles, Pixeles, CoordY_final, 0, 0, PixelesH),
-    sort(PixelesH, Pixeles2), % provisionalmente uso sort, mejor intenta crear un predicado para ordenar
+    sort(PixelesH, PixelesH2),
+    removerElemento([], PixelesH2, Pixeles2),
     image(CoordX, CoordY, Pixeles2, Imagen2).
-
-
 
 % Descripción: Predicado que voltea los pixeles verticalmente
 % Dominio: list X list X int X int X int X int X variable
@@ -218,8 +180,6 @@ flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, CoordY, CoordY_f
             R3 is CoordY+1,
             flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, R3, CoordY_final, Contador, Cola2).
 
-
-
 % Descripción: Predicado que voltea la imagen verticalmente
 % Dominio: imagen X variable
 % Recorrido: imagen
@@ -228,28 +188,27 @@ imageFlipV(Imagen, Imagen2):-
     image(CoordX, CoordY, Pixeles, Imagen),
     CoordX_final is CoordX-1, CoordY_final is CoordY-1,
     flipV_formato(Pixeles, Pixeles, CoordX_final, 0, CoordY_final, 0, PixelesV),
-    sort(PixelesV, Pixeles2), % provisionalmente uso sort, mejor intenta crear un predicado para ordenar
+    sort(PixelesV, PixelesV2),
+    removerElemento([], PixelesV2, Pixeles2),
     image(CoordX, CoordY, Pixeles2, Imagen2).
 
 % Descripción: Predicado que verifica si el Pixel esta dentro del rango
 % dado por crop
 % Dominio: Pixel X int X int X int X int
 rangoXY(Pixel, X1,X2,Y1,Y2):-
-    esBitmap([Pixel]) ->
-        pixbit_d(X,Y,_,_, Pixel),
-        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) ->
-        true; false;
-    esHexmap([Pixel]) ->
-        pixhex_d(X,Y,_,_, Pixel),
-        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) ->
-        true; false;
-    esPixmap([Pixel]) ->
-        pixrgb_d(X,Y,_,_,_,_, Pixel),
-        pixhex_d(X,Y,_,_, Pixel),
-        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) ->
-        true; false.
+    esBitmap([Pixel]) -> pixbit(X,Y,_,_, Pixel),
+        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false;
+    esHexmap([Pixel]) -> pixhex(X,Y,_,_, Pixel),
+        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false;
+    esPixmap([Pixel]) -> pixrgb(X,Y,_,_,_,_, Pixel),
+        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false.
 
-
+% Descripción: Predicado que crea eliminar los pixeles que no esten en
+% el rango establecido por imageCrop
+% Dominio: list X int X int x int X int X variable
+% Recorrido: list
+% Tipo de recursión: Natural, pues crea una lista con base a estados
+% pendientes
 crop_formato([], _,_, _, _, []).
 crop_formato([Cabeza | Cola], X1, X2, Y1, Y2, [Cabeza2 | Cola2]):-
      rangoXY(Cabeza, X1, X2, Y1, Y2) ->
@@ -259,19 +218,26 @@ crop_formato([Cabeza | Cola], X1, X2, Y1, Y2, [Cabeza2 | Cola2]):-
             crop_formato(Cola, X1, X2, Y1, Y2, Cola2).
 
 
+% Descripción: Predicado que devuelve el mayor entre dos números.
+% Dominio: int X int X variable. Recorrido: int
 mayor(A,B,C):- A >= B -> C is A ; C is B.
+
+% Descripción: Predicado que devuelve el menor entre dos números
+% Dominio: int X int X variable. Recorrido: int
 menor(A,B,C):- A =< B -> C is A ; C is B.
 
 
+% Descripción: Predicado que elimina los pixeles de una imagen que no
+% esten en el cuadrante definido
+% Dominio: Imagen X int X int X int X int X variable
+% Recorrido: Imagen
 imageCrop(Imagen, X1,X2,Y1,Y2,Imagen2):-
     esImage(Imagen),
     image(CoordX, CoordY, Pixeles, Imagen),
     menor(X1,X2,X_menor), mayor(X1,X2,X_mayor),
     menor(Y1,Y2,Y_menor), mayor(Y1,Y2,Y_mayor),
-    crop_formato(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, Pixeles2),
-    image(CoordX, CoordY, Pixeles2, Imagen2).
-
-
+    crop_formato(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC),
+    removerElemento([], PixelesC, Pixeles2), image(CoordX, CoordY, Pixeles2, Imagen2).
 
 % Descripción: Predicado que entrega el equivalente a string de un
 % número entero
@@ -283,24 +249,24 @@ numeroString(Num, String):-
     (Num = 8), String = "8"; (Num = 9), String = "9"; (Num = 10), String = "A"; (Num = 11), String = "B";
     (Num = 12), String = "C"; (Num = 13), String = "D"; (Num = 14), String = "E"; (Num = 15), String = "F"; false.
 
-
 % Descripción: Predicado que convierte un pixmap a hexmap
 % Dominio: pixel x variable
 % Recorrido: pixel
 stringRGB(Pixel, PixelH):-
-    pixrgb_d(X,Y,R,G,B,D,Pixel),
+    pixrgb(X,Y,R,G,B,D,Pixel),
     EnteroR is R // 16, RestoR is R mod 16, EnteroG is G // 16, RestoG is G mod 16, EnteroB is B // 16, RestoB is B mod 16,
     numeroString(EnteroR, R1), numeroString(RestoR, R2), numeroString(EnteroG, G1), numeroString(RestoG, G2),
     numeroString(EnteroB, B1), numeroString(RestoB, B2),
     string_concat(R1, R2, R_hex), string_concat(G1, G2, G_hex), string_concat(B1, B2, B_hex),
     string_concat(R_hex, G_hex, ColorParcial), string_concat(ColorParcial, B_hex, ColorHex),
-    pixhex_d(X,Y,ColorHex, D, PixelH).
-
+    pixhex(X,Y,ColorHex, D, PixelH).
 
 % Descripción: Predicado que cambia el formato de pixeles pixmap a
 % hexmap
 % Dominio: list X variable
 % Recorrido: list
+% Tipo de recursión: Natural pues crea una nueva lista con base a
+% estados pendientes
 formatoRGB_HEX([], []).
 formatoRGB_HEX([Cabeza | Cola], [NuevaCabeza | Cola2]):-
     stringRGB(Cabeza, NuevaCabeza),
@@ -310,12 +276,202 @@ formatoRGB_HEX([Cabeza | Cola], [NuevaCabeza | Cola2]):-
 % Dominio: imagen X variable
 % Recorrido: imagen
 imageRGBToHex(Imagen, Imagen2):-
-    esImage(Imagen),
     image(CoordX, CoordY, Pixeles, Imagen),
+    esPixmap(Pixeles),
     formatoRGB_HEX(Pixeles, Pixeles2),
     image(CoordX, CoordY, Pixeles2, Imagen2).
 
+% Descripción: Predicado que cambia un pixrgb_d por su color opuesto
+% Dominio: pixrgb_d X variable
+% Recorrido: pixrgb_d
+imageInvertColorRGB(Pixel, Pixel2):-
+    pixrgb(X,Y,R,G,B,D, Pixel),
+    R_invert is 255 - R, G_invert is 255 - G, B_invert is 255 - B,
+    pixrgb(X,Y,R_invert, G_invert, B_invert, D, Pixel2).
 
+% Descripción: Predicado que verifica si dos pixbit tienen mismo
+% bit, dos pixhex tiene el mismo hex y dos pixrgb tienen el mismo RGB
+% Dominio: pixel X pixel
+% Recorrido: Boleano
+igualColor(Pixel, Pixel2):-
+    esBitmap([Pixel, Pixel2]) ->
+        pixbit(_,_,B,_, Pixel), pixbit(_,_,B,_, Pixel2) -> true; false
+   ;
+    esHexmap([Pixel, Pixel2]) ->
+        pixhex(_,_,H,_, Pixel), pixhex(_,_,H,_, Pixel2) -> true; false
+   ;
+    esPixmap([Pixel, Pixel2]) ->
+        pixrgb(_,_,R,G,B,_, Pixel), pixrgb(_,_,R,G,B,_, Pixel2) -> true; false
+   ;
+   false.
+
+% Descripción: Predicado que eliminar un color de una lista de pixeles
+% Dominio: list X pixel X variable
+% Recorrido: list
+% Tipo de recursión: Natural, pues crea una nueva lista con base a
+% estados pendientes
+eliminarColor([], _, []).
+eliminarColor([Cabeza | Cola], Pixel, [NuevaCabeza | Cola2]):-
+    igualColor(Cabeza, Pixel) ->
+        eliminarColor(Cola, Pixel, Cola2);
+        append(Cabeza, [], NuevaCabeza),
+        eliminarColor(Cola, Pixel, Cola2).
+
+esPixel(Elemento):-
+    esBitmap([Elemento]) -> true;
+    esPixmap([Elemento]) -> true;
+    esHexmap([Elemento]) -> true; false.
+
+% Predicado que obtiene la cabeza de pixeles
+% Dominio: list X variable
+% Recorrido: pixel
+cabezaPixel([],[]).
+cabezaPixel([Cabeza | Cola], NuevaCabeza):-
+    esPixel(Cabeza) -> append(Cabeza, [], NuevaCabeza);
+    cabezaPixel(Cola, NuevaCabeza).
+
+% Descripción: Predicado que suma los elementos iguales de pixeles
+% Dominio: list X pixel X variable
+% Recorrio: int
+% Tipo de recursión: Natural, pues cuenta con base a estados pendientes
+contarColor([], _, 0).
+contarColor([Cabeza | Cola], Pixel, C):-
+    igualColor(Cabeza, Pixel) ->
+        !, contarColor(Cola, Pixel, C1), C is C1+1;
+        contarColor(Cola, Pixel, C).
+
+
+% Descripción: Predicado que recopila la información de color de los pixeles
+% Dominio: list X variable
+% Recorrido: list
+histograma_formato([], _).
+histograma_formato([Cabeza | Cola], [[Elemento , Cantidad] | Cola2]):-
+        pixrgb(_,_,R,G,B,_, Cabeza),
+        append([R], [G], L), append(L, [B], Elemento),
+        contarColor([Cabeza | Cola], Cabeza, Cantidad),
+        eliminarColor([Cabeza | Cola], Cabeza, NuevaLista),
+        removerElemento([], NuevaLista, NuevaLista2),
+        histograma_formato(NuevaLista2, Cola2).
+
+% Descripción: Predicado que obtiene el histograma de una imagen
+% Dominio: imagen X variable
+% Recorrido: list x variable
+% imageToHistogram
+imageToHistogram(Imagen, Histograma):-
+    image(_,_,Pixeles, Imagen), histograma_formato(Pixeles, H),
+    removerElemento([], H, Histograma).
+
+
+% Descripción: Predicado que modifica los pixeles de una imagen rotando 90° a la derecha
+% Dominio: list X list X int X int X int X int X variable
+% Recorrido: list
+rotate90_formato(_,[],_,_,_,_,_).
+rotate90_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX, Contador, CoordX_final, CoordY_final, [NuevaCabeza | Cola2]):-
+    existeCoordXY([CabezaC | ColaC], CoordX, Contador) ->
+        R1 is Contador+1,
+        cambiarCoordXY(Cabeza, Contador, CoordX_final, NuevaCabeza),
+        rotate90_formato([CabezaC | ColaC], Cola, CoordX, R1, CoordX_final, CoordY_final, Cola2)
+        ;
+        (Contador > CoordY_final) ->
+            R3 is CoordX+1,
+            R4 is CoordX_final-1,
+            rotate90_formato([CabezaC | ColaC], [Cabeza | Cola], R3, 0, R4, CoordY_final, Cola2)
+            ;
+            R3 is Contador+1,
+            rotate90_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX, R3, CoordX_final, CoordY_final, Cola2).
+
+
+% Descripción: Predicado que rota una imagen 90° a la derecha
+% Dominio: imagen X variable
+% Recorrido: imagen
+imageRotate90(Imagen, Imagen2):-
+    esImage(Imagen),
+    image(CoordX, CoordY, Pixeles, Imagen),
+    CoordX_final is CoordY-1, CoordY_final is CoordX-1,
+    write("\nX="), write(CoordX_final), write("  Y="), write(CoordY_final),
+    rotate90_formato(Pixeles, Pixeles, 0, 0, CoordX_final, CoordY_final, Pixeles2),
+    %write("\nsalio"),
+    %write("\nsalio2"),
+    image(CoordY, CoordX, Pixeles2, Imagen2).
+
+
+% Descripción: Predicado que verifica si dos pixeles tienen la misma
+% coordenada (x,y)
+% Dominio: pixel X pixel
+% Recorrido: Boleano
+igualCoordXY(Pixel, Pixel2):-
+    esPixmap([Pixel , Pixel2]) ->
+        pixrgb(X,Y,_,_,_,_, Pixel), pixrgb(X,Y,_,_,_,_, Pixel2) -> true; false
+    ;
+    esBitmap([Pixel , Pixel2]) ->
+         pixbit(X,Y,_,_, Pixel), pixbit(X,Y,_,_, Pixel2) -> true; false
+    ;
+    esHexmap([Pixel , Pixel2]) ->
+         pixhex(X,Y,_,_, Pixel), pixhex(X,Y,_,_, Pixel2) -> true; false
+    ;
+    false.
+
+
+% Descripción: Predicado que reemplaza un pixel de pixeles
+% Dominio: list X Pixel X variable
+% Recorrido: list
+changePixel([], _, []).
+changePixel([Cabeza | Cola], Pixel, [NuevaCabeza | Cola2]):-
+    igualCoordXY(Cabeza, Pixel) ->
+            append(Pixel, [], NuevaCabeza),
+            changePixel(Cola, Pixel, Cola2)
+            ;
+            append(Cabeza, [], NuevaCabeza),
+            changePixel(Cola, Pixel, Cola2).
+
+
+% Descripción: Predicado que reemplaza un pixel de la imagen
+% Dominio: Imagen X pixel X variable
+% Recorrido: Imagen
+imageChangePixel(Imagen, Pixel, Imagen2):-
+    esImage(Imagen),
+    image(CoordX, CoordY, Pixeles, Imagen),
+    changePixel(Pixeles, Pixel, Pixeles2),
+    image(CoordX, CoordY, Pixeles2, Imagen2).
+
+
+
+colorPixel(Pixel, Color):-
+    esBitmap([Pixel]) ->  pixbit(_,_,Color, _, Pixel);
+    esHexmap([Pixel]) -> pixhex(_,_, Color, _, Pixel).
+
+
+%espacioRelleno(Pixel, String):-
+%    esBitmap([Pixel]) -> string_concat("", "", String);
+%    esHexmap([Pixel]) -> string_concat("", "", String);
+%    esPixmap([Pixel]) -> string_concat("", "\t\t\t\t", String).
+
+imageString_formato(_, [],_,_, _, ["\n"]).
+imageString_formato([CabezaC| ColaC], [Cabeza| Cola], CoordY, CoordX, CoordY_final, [String | Cola2]):-
+    existeCoordXY([CabezaC | ColaC], CoordX, CoordY) ->
+
+              R is CoordY + 1,
+              colorPixel(Cabeza, Color),
+              string_concat(Color, "\t", String),
+              imageString_formato([CabezaC | ColaC], Cola, R, CoordX, CoordY_final, Cola2)
+        ;
+              CoordY > CoordY_final ->
+                       R3 is CoordX + 1,
+                       string_concat("\n", "", String),
+                       imageString_formato([CabezaC | ColaC], [Cabeza | Cola], 0, R3, CoordY_final, Cola2)
+                       ;
+                       R2 is CoordY + 1,
+                       %espacioRelleno(CabezaC, Relleno),
+                       string_concat("", "\t", String),
+                       imageString_formato([CabezaC | ColaC], [Cabeza | Cola], R2, CoordX, CoordY_final, Cola2).
+
+% Descripción: Predicado que crea una cadena de string de la imagen
+% Dominio: image X variable
+% Recorrido: string
+imageToString(Imagen, Cadena):-
+    esImage(Imagen), image(_,CoordY,Pixeles, Imagen), CoordY_final is CoordY-1,
+    imageString_formato(Pixeles, Pixeles, 0, 0, CoordY_final, String),
+    atomics_to_string(String, Cadena).
 
 contar(_,[],0).
 contar(X,[X|L],C):- !,contar(X,L,C1), C is C1+1.
@@ -331,10 +487,6 @@ lista1([Cabeza | Cola], [Cabeza2 | Cola2]):-
     lista1(Cola, Cola2).
 
 
-
-
-
-
 % Descripción: Predicado que elimina de una lista un elemento
 % Dominio: list X elemento X variable
 % Recorrido: list
@@ -343,12 +495,17 @@ eliminar([Cabeza | Cola], Elemento, [Cabeza2 | Cola2]):-
     Cabeza \== Elemento ->
         Cabeza2 is Cabeza,
         eliminar(Cola, Elemento, Cola2);
-        eliminar(Cola, Elemento, Cola2).
+        eliminar(Cola, Elemento, Cola2),!.
 
 agregarElemento([H|T], E, [H | T2]):-
     agregarElemento(T,E,T2).
 
 
+pixelLista([Cabeza | Cola], L):-
+    esPixel(Cabeza) ->  append([Cabeza], Cola, L);
+                        append(Cola, [], L).
+
+cabezaLista([Cabeza | _], P):- append(Cabeza, [], P).
 
 inserta([],X,[X]).
 inserta([H|T], N, [H|R]) :- inserta(T, N, R).
@@ -381,3 +538,4 @@ condicional(A):-
       A=1 -> true;
       A=2 -> false;
     string(A) -> true.
+
