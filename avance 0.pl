@@ -20,11 +20,15 @@ image_vacia([]).
 %Reglas -> nombre(argumentos) de los que tienen :-
 %
 
+
 %Descripción: Define como es un pixbit_d
 %Dominio: CoordX, CoordY, Bit, Profundidad, Letra
 %Recorrido: pixbit_d
 pixbit(CoordX, CoordY, Bit, Profundidad, [CoordX, CoordY, Bit, Profundidad]):-
     integer(CoordX),CoordX >= 0, integer(CoordY),CoordY >= 0, integer(Bit),Bit = 0;Bit = 1, integer(Profundidad),Profundidad >= 0.
+
+pixbit_comprimido(CoordX, CoordY, Bit, Profundidad, [CoordX, CoordY, Bit, Profundidad]):-
+    integer(CoordX),CoordX >= 0, integer(CoordY),CoordY >= 0, is_list(Bit), integer(Profundidad),Profundidad >= 0.
 
 % Descripción: Define como es un pixrgb_d
 % Dominio: CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad, Letra
@@ -34,12 +38,21 @@ pixrgb(CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad, [CoordX, CoordY, Col
     integer(ColorR), ColorR >= 0; ColorR =< 255, integer(ColorG), ColorG >= 0; ColorG =< 255,
     integer(ColorB), ColorB >= 0; ColorB =< 255, integer(Profundidad), Profundidad >= 0.
 
+pixrgb_comprimido(CoordX, CoordY, HexR, HexG, HexB, Profundidad, [CoordX, CoordY, HexR, HexG, HexB, Profundidad]):-
+    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0, string(HexR), string(HexG), string(HexB), integer(Profundidad), Profundidad >= 0.
+
 % Descripción: Define como es un pixhex_d
 % Dominio: CoordX, CoordY, Hex, Profundidad, Letra
 % Recorrido: pixhex_d
 % comentarios: los string son "", no ''
 pixhex(CoordX, CoordY, Hex, Profundidad, [CoordX, CoordY, Hex, Profundidad]):-
     integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0, string(Hex), integer(Profundidad), Profundidad >= 0.
+
+pixhex_comprimido(CoordX, CoordY, [ColorR, ColorG, ColorB], Profundidad, [CoordX, CoordY, [ColorR, ColorG, ColorB], Profundidad]):-
+    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0,
+    integer(ColorR), ColorR >= 0; ColorR =< 255, integer(ColorG), ColorG >= 0; ColorG =< 255,
+    integer(ColorB), ColorB >= 0; ColorB =< 255, integer(Profundidad), Profundidad >= 0.
+
 
 % Descripción: Define como es una imagen
 % Dominio: Ancho, Largo, Pixeles, Letra
@@ -56,6 +69,17 @@ esBitmap([Cabeza | Cola]):-
     is_list(Cabeza), length(Cabeza, N), N == 4, pixbit(X,Y,B,D, Cabeza), pixbit(X,Y,B,D, P),
     P \== false -> esBitmap(Cola); false.
 
+% Descripción: Consulta si los pixeles de una imagen son pixbit_d comprimido
+% Dominio: Lista de pixeles
+% Recorrido: Boleano
+% Tipo de recursión: Cola, llama sin estados pendientes.
+esBitmapComprimido([]):- !, false.
+esBitmapComprimido([Cabeza | Cola]):-
+    is_list(Cabeza), length(Cabeza, N), N == 4,
+    pixbit_comprimido(X,Y,B,D, Cabeza), pixbit_comprimido(X,Y,B,D, P),
+    P \== false -> true; esBitmapComprimido(Cola).
+
+
 % Descripción: Consulta si los pixeles de una imagen son pixrgb_d
 % Dominio: Lista de pixeles
 % Recorrido: Boleano
@@ -65,6 +89,18 @@ esPixmap([Cabeza | Cola]):-
     is_list(Cabeza), length(Cabeza, N), N == 6, pixrgb(X,Y,R,G,B,D, Cabeza), pixrgb(X,Y,R,G,B,D, P),
     P \== false -> esPixmap(Cola); false.
 
+
+% Descripción: Consulta si los pixeles de una imagen son pixrgb_d comprimido
+% Dominio: Lista de pixeles
+% Recorrido: Boleano
+% Tipo de recusión: Cola, llama sin estados pendientes
+esPixmapComprimido([]):- !, false.
+esPixmapComprimido([Cabeza | Cola]):-
+    is_list(Cabeza), length(Cabeza, N), N == 6,
+    pixrgb_comprimido(X,Y,R,G,B,D, Cabeza), pixrgb_comprimido(X,Y,R,G,B,D, P),
+    P \== false -> true; esPixmapComprimido(Cola).
+
+
 % Descripción: Consulta si los pixeles de una imagen son pixhex_d
 % Dominio: Lista de pixeles
 % Recorrido(Boleano)
@@ -73,6 +109,17 @@ esHexmap([]).
 esHexmap([Cabeza | Cola]):-
     is_list(Cabeza), length(Cabeza, N), N == 4, pixhex(X,Y,H,D, Cabeza), pixhex(X,Y,H,D, P),
     P \== false -> esHexmap(Cola); false.
+
+% Descripción: Consulta si los pixeles de una imagen son pixhex_d comprimido
+% Dominio: Lista de pixeles
+% Recorrido(Boleano)
+% Tipo de recursión: Cola, llama sin estados pendientes
+esHexmapComprimido([]):- !, false.
+esHexmapComprimido([Cabeza | Cola]):-
+    is_list(Cabeza), length(Cabeza, N), N == 4,
+    pixhex_comprimido(X,Y,H,D, Cabeza), pixhex_comprimido(X,Y,H,D, P),
+    P \== false -> true; esHexmapComprimido(Cola).
+
 
 % Descripción: Predicado que verifica si una imagen es Bitmap
 % Dominio: image
@@ -88,6 +135,17 @@ imageIsPixmap(Imagen):- image(_,_,P, Imagen), esPixmap(P) -> true; false.
 % Dominio: image
 % Recorrido: Boleano
 imageIsHexmap(Imagen):- image(_,_,P, Imagen), esHexmap(P) -> true; false.
+
+% Descripción: Predicado que verifica si una imagen fue comprimida
+% Dominio: image
+% Recorrido: Boleano
+imageIsCompress(Imagen):-
+    image(_,_,P, Imagen),
+    esHexmapComprimido(P) -> true;
+    image(_,_,P, Imagen),
+    esPixmapComprimido(P) -> true;
+    image(_,_,P, Imagen),
+    esBitmapComprimido(P) -> true; false.
 
 % Descripción: Predicado que verifica existencia de (x,y) en Pixel
 % Dominio: Pixel, int, int
@@ -239,6 +297,7 @@ imageCrop(Imagen, X1,X2,Y1,Y2,Imagen2):-
     crop_formato(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC),
     removerElemento([], PixelesC, Pixeles2), image(CoordX, CoordY, Pixeles2, Imagen2).
 
+
 % Descripción: Predicado que entrega el equivalente a string de un
 % número entero
 % Dominio: int X variable
@@ -249,16 +308,55 @@ numeroString(Num, String):-
     (Num = 8), String = "8"; (Num = 9), String = "9"; (Num = 10), String = "A"; (Num = 11), String = "B";
     (Num = 12), String = "C"; (Num = 13), String = "D"; (Num = 14), String = "E"; (Num = 15), String = "F"; false.
 
+stringNumero(String, Num):-
+    (String = "0"), Num = 0; (String = "1"), Num = 1; (String = "2"), Num = 2; (String = "3"), Num = 3;
+    (String = "4"), Num = 4; (String = "5"), Num = 5; (String = "6"), Num = 6; (String = "7"), Num = 7;
+    (String = "8"), Num = 8; (String = "9"), Num = 9; (String = "A"), Num = 10; (String = "B"), Num = 11;
+    (String = "C"), Num = 12; (String = "D"), Num = 13, (String = "E"), Num = 14; (String = "F"), Num = 15; false.
+
+listHEX_RGB(String, [R, G, B]):-
+    sub_string(String,1,_,4,S1),
+    hexRGB(S1,R),
+    sub_string(String,3,_,2,S2),
+    hexRGB(S2,G),
+    sub_string(String,5,_,0,S3),
+    hexRGB(S3,B).
+
+% Descripción: Predicado que convierte una lista de 3 valores pixmap a string hexmap
+% Dominio: list X variable
+% Recorrido: string
+listRGB_HEX([R, G, B], ColorHex):-
+    rgbHex(R, R_hex), rgbHex(G, G_hex), rgbHex(B, B_hex),
+    string_concat("#", R_hex, ColorParcial), string_concat(G_hex, B_hex, ColorParcial2),
+    string_concat(ColorParcial, ColorParcial2, ColorHex).
+
+rgbHex(Num, String):-
+    Entero is Num // 16, Resto is Num mod 16,
+    numeroString(Entero, N1), numeroString(Resto, N2),
+    string_concat(N1,N2, String).
+
+hexRGB(String, Color):-
+    sub_string(String,0,_,1,S1),
+    (S1 = "0") ->
+        sub_string(String,1,_,0,S2), stringNumero(S2,N2),
+        Color is N2
+        ;
+        sub_string(String,1,_,0,S2),
+        (S2 = "0") ->
+            sub_string(String,0,_,1,S1), stringNumero(S1,N1),
+            Color is N1 * 16
+            ;
+            sub_string(String,0,_,1,S1), sub_string(String,1,_,0,S2),
+            stringNumero(S1,N1), stringNumero(S2,N2),
+            Color is N1 + N2 * 16.
+
+
 % Descripción: Predicado que convierte un pixmap a hexmap
 % Dominio: pixel x variable
 % Recorrido: pixel
 stringRGB(Pixel, PixelH):-
     pixrgb(X,Y,R,G,B,D,Pixel),
-    EnteroR is R // 16, RestoR is R mod 16, EnteroG is G // 16, RestoG is G mod 16, EnteroB is B // 16, RestoB is B mod 16,
-    numeroString(EnteroR, R1), numeroString(RestoR, R2), numeroString(EnteroG, G1), numeroString(RestoG, G2),
-    numeroString(EnteroB, B1), numeroString(RestoB, B2),
-    string_concat(R1, R2, R_hex), string_concat(G1, G2, G_hex), string_concat(B1, B2, B_hex),
-    string_concat(R_hex, G_hex, ColorParcial), string_concat(ColorParcial, B_hex, ColorHex),
+    listRGB_HEX([R,G,B], ColorHex),
     pixhex(X,Y,ColorHex, D, PixelH).
 
 % Descripción: Predicado que cambia el formato de pixeles pixmap a
@@ -345,9 +443,8 @@ contarColor([Cabeza | Cola], Pixel, C):-
 % Dominio: list X variable
 % Recorrido: list
 histograma_formato([], _).
-histograma_formato([Cabeza | Cola], [[Elemento , Cantidad] | Cola2]):-
-        pixrgb(_,_,R,G,B,_, Cabeza),
-        append([R], [G], L), append(L, [B], Elemento),
+histograma_formato([Cabeza | Cola], [[Cantidad , Elemento] | Cola2]):-
+        colorPixel(Cabeza, Elemento),
         contarColor([Cabeza | Cola], Cabeza, Cantidad),
         eliminarColor([Cabeza | Cola], Cabeza, NuevaLista),
         removerElemento([], NuevaLista, NuevaLista2),
@@ -394,6 +491,51 @@ imageRotate90(Imagen, Imagen2):-
     %write("\nsalio2"),
     image(CoordY, CoordX, Pixeles2, Imagen2).
 
+% Descripción: Predicado que obtiene el pixel más repetido
+% Dominio: list x variable
+% Recorrido: pixel
+pixelMasRepetido([], _, E, Elemento):- Elemento = E.
+pixelMasRepetido([Cabeza | Cola], Cant, Elem, Elemento):-
+    [Cantidad , _] = Cabeza,
+    (Cantidad > Cant) ->
+        [Cantidad, E] = Cabeza,
+        pixelMasRepetido(Cola, Cantidad, E, Elemento);
+        pixelMasRepetido(Cola, Cant, Elem, Elemento).
+
+% Descripción: Predicado que comprime pixeles
+% Dominio:
+% Recorrido:
+comprimirPixeles([],_,[]).
+comprimirPixeles([Cabeza | Cola], Color, [NuevaCabeza, Cola2]):-
+    colorPixel(Cabeza, C),
+    (C = Color) ->
+       comprimirPixel(Cabeza, NuevaCabeza),
+       comprimirPixeles(Cola, Color, Cola2);
+       append(Cabeza, [], NuevaCabeza),
+       comprimirPixeles(Cola, Color, Cola2).
+
+comprimirPixel(Pixel, Pixel2):-
+    esBitmap([Pixel]) ->
+        pixbit(X,Y,B,D,Pixel), pixbit_comprimido(X,Y,[-1, B],D,Pixel2);
+    esHexmap([Pixel]) ->
+        pixhex(X,Y,S,D,Pixel), listHEX_RGB(S, H), pixhex_comprimido(X,Y,H,D,Pixel2);
+    esPixmap([Pixel]) ->
+        pixrgb(X,Y,R,G,B,D,Pixel),
+        rgbHex(R, HexR),
+        rgbHex(G, HexG),
+        rgbHex(B, HexB), pixrgb_comprimido(X,Y,HexR,HexG,HexB,D,Pixel2);
+    false.
+
+imageCompress(Imagen, Imagen2):-
+    esImage(Imagen),
+    image(X,Y,Pixeles, Imagen),
+    imageToHistogram(Imagen, H),
+    pixelMasRepetido(H, -1, _, PixelMasRepetido),
+    comprimirPixeles(Pixeles, PixelMasRepetido, PixelesC),
+    sort(PixelesC, PixelesC2),
+    removerElemento([], PixelesC2, Pixeles2),write(Pixeles2),
+    image(X,Y,Pixeles2, Imagen2).
+
 
 % Descripción: Predicado que verifica si dos pixeles tienen la misma
 % coordenada (x,y)
@@ -438,7 +580,8 @@ imageChangePixel(Imagen, Pixel, Imagen2):-
 
 colorPixel(Pixel, Color):-
     esBitmap([Pixel]) ->  pixbit(_,_,Color, _, Pixel);
-    esHexmap([Pixel]) -> pixhex(_,_, Color, _, Pixel).
+    esHexmap([Pixel]) -> pixhex(_,_, Color, _, Pixel);
+    esPixmap([Pixel]) -> pixrgb(_,_,R,G,B, _, Pixel), Color = [R,G,B].
 
 
 %espacioRelleno(Pixel, String):-
@@ -472,6 +615,24 @@ imageToString(Imagen, Cadena):-
     esImage(Imagen), image(_,CoordY,Pixeles, Imagen), CoordY_final is CoordY-1,
     imageString_formato(Pixeles, Pixeles, 0, 0, CoordY_final, String),
     atomics_to_string(String, Cadena).
+
+pixelComprimido(Pixel, Pixel2):-
+    esPixmapComprimido([Pixel]) ->
+        pixrgb_comprimido(X,Y,R_hex,G_hex,B_hex,D,Pixel),
+        hexRGB(R_hex,R), hexRGB(G_hex,G), hexRGB(B_hex, B),
+        pixrgb(X,Y,R,G,B,D,Pixel2);
+    esHexmapComprimido([Pixel]) ->
+        pixhex_comprimido(X,Y,H_list,D, Pixel),
+        listRGB_HEX(H_list, H), pixhex(X,Y,H,D, Pixel2);
+    esBitmapComprimido([Pixel])->
+        pixbit_comprimido(X,Y,B_list,D, Pixel),
+        [_, B] = B_list, pixbit(X,Y,B,D, Pixel2).
+
+
+% Descripción: Predicado que descomprime una imagen
+% Dominio:
+% Recorrido
+% imageDecompress
 
 contar(_,[],0).
 contar(X,[X|L],C):- !,contar(X,L,C1), C is C1+1.
