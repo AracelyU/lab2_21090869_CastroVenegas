@@ -207,7 +207,22 @@ flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, Contador
                     R3 is Contador+1,
                     flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, R3, Cola2).
 
-                    % Descripción: Predicado que voltea la imagen horizontalmente
+/*
+
+% Descripción: Predicado que voltea la imagen horizontalmente
+% Dominio: imagen X variable
+% Recorrido: imagen
+imageFlipH(Imagen, Imagen2):-
+    esImage(Imagen),
+    image(CoordX, CoordY, Pixeles, Imagen),
+    CoordY_final is CoordY-1,
+    flipH_formato(Pixeles, Pixeles, CoordY_final, 0, 0, PixelesH),
+    sort(PixelesH, PixelesH2),
+    removerElemento([], PixelesH2, Pixeles2),
+    image(CoordX, CoordY, Pixeles2, Imagen2).
+*/
+
+% Descripción: Predicado que voltea la imagen horizontalmente
 % Dominio: imagen X variable
 % Recorrido: imagen
 imageFlipH(Imagen, Imagen2):-

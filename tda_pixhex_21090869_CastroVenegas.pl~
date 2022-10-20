@@ -1,0 +1,38 @@
+:- module(tda_pixhex_21090869_CastroVenegas, [pixhex/5,
+                                              pixhex_comprimido/5,
+                                              esHexmap/1,
+                                              esHexmapComprimido/1]).
+
+
+% Descripción: Define como es un pixhex_d
+% Dominio: CoordX, CoordY, Hex, Profundidad, Letra
+% Recorrido: pixhex_d
+% comentarios: los string son "", no ''
+pixhex(CoordX, CoordY, Hex, Profundidad, [CoordX, CoordY, Hex, Profundidad]):-
+    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0, string(Hex), integer(Profundidad), Profundidad >= 0.
+
+pixhex_comprimido(CoordX, CoordY, [ColorR, ColorG, ColorB], Profundidad, [CoordX, CoordY, [ColorR, ColorG, ColorB], Profundidad]):-
+    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0,
+    integer(ColorR), ColorR >= 0; ColorR =< 255, integer(ColorG), ColorG >= 0; ColorG =< 255,
+    integer(ColorB), ColorB >= 0; ColorB =< 255, integer(Profundidad), Profundidad >= 0.
+
+% Descripción: Consulta si los pixeles de una imagen son pixhex_d
+% Dominio: Lista de pixeles
+% Recorrido(Boleano)
+% Tipo de recursión: Cola, llama sin estados pendientes
+esHexmap([]).
+esHexmap([Cabeza | Cola]):-
+    is_list(Cabeza), length(Cabeza, N), N == 4, pixhex(X,Y,H,D, Cabeza), pixhex(X,Y,H,D, P),
+    P \== false -> esHexmap(Cola); false.
+
+% Descripción: Consulta si los pixeles de una imagen son pixhex_d comprimido
+% Dominio: Lista de pixeles
+% Recorrido(Boleano)
+% Tipo de recursión: Cola, llama sin estados pendientes
+esHexmapComprimido([]):- !, false.
+esHexmapComprimido([Cabeza | Cola]):-
+    is_list(Cabeza), length(Cabeza, N), N == 4,
+    pixhex_comprimido(X,Y,H,D, Cabeza), pixhex_comprimido(X,Y,H,D, P),
+    P \== false -> true; esHexmapComprimido(Cola).
+
+

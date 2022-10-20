@@ -1,0 +1,15 @@
+
+
+:- module(tda_pixrgb_21090869_CastroVenegas, [pixrgb/7]).
+
+% Descripción: Define como es un pixrgb_d
+% Dominio: CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad, Letra
+% Recorrido: pixrgb_d
+pixrgb(CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad, [CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad]):-
+    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0,
+    integer(ColorR), ColorR >= 0; ColorR =< 255, integer(ColorG), ColorG >= 0; ColorG =< 255,
+    integer(ColorB), ColorB >= 0; ColorB =< 255, integer(Profundidad), Profundidad >= 0.
+
+pixrgb_comprimido(CoordX, CoordY, HexR, HexG, HexB, Profundidad, [CoordX, CoordY, HexR, HexG, HexB, Profundidad]):-
+    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0, string(HexR), string(HexG), string(HexB), integer(Profundidad), Profundidad >= 0.
+
