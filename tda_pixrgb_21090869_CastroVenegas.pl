@@ -51,13 +51,6 @@ pixrgb(CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad, [CoordX, CoordY, Col
     integer(ColorR), ColorR >= 0; ColorR =< 255, integer(ColorG), ColorG >= 0; ColorG =< 255,
     integer(ColorB), ColorB >= 0; ColorB =< 255, integer(Profundidad), Profundidad >= 0.
 
-% Descripción: Predicado que define como es un pixrgb_comprimido
-% Dominio: int X int X string X string X string X int X variable (list)
-% Recorrido: pixrgb_comprimido
-% Tipo: Constructor
-pixrgb_comprimido(CoordX, CoordY, HexR, HexG, HexB, Profundidad, [CoordX, CoordY, HexR, HexG, HexB, Profundidad]):-
-    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0, string(HexR), string(HexG), string(HexB), integer(Profundidad), Profundidad >= 0.
-
 % Descripción: Predicado que verifica si los pixeles son pixrgb
 % Dominio: Pixel (list)
 % Recorrido: Boleano
@@ -68,18 +61,6 @@ esPixmap([Cabeza | Cola]):-
     is_list(Cabeza), length(Cabeza, N), N == 6, pixrgb(X,Y,R,G,B,D, Cabeza), pixrgb(X,Y,R,G,B,D, P),
     P \== false -> esPixmap(Cola); false.
 
-% Descripción: Predicado que verifica si los pixeles son
-% pixrgb_comprimido
-% Dominio: Pixel (list)
-% Recorrido: Boleano
-% Tipo: Pertenencia
-% Tipo de recusión: Cola, da resultado sin estados
-% pendientes
-esPixmapComprimido([]):- !, false.
-esPixmapComprimido([Cabeza | Cola]):-
-    is_list(Cabeza), length(Cabeza, N), N == 6,
-    pixrgb_comprimido(X,Y,R,G,B,D, Cabeza), pixrgb_comprimido(X,Y,R,G,B,D, P),
-    P \== false -> true; esPixmapComprimido(Cola).
 
 % Descripción: Predicado que obtiene la coordenadas (X,Y) de un pixrgb
 % Dominio: pixrgb X variable (int) X variable (int)
