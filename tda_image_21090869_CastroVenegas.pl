@@ -1,8 +1,24 @@
 :- use_module(tda_pixbit_21090869_CastroVenegas).
 :- use_module(tda_pixhex_21090869_CastroVenegas).
 :- use_module(tda_pixrgb_21090869_CastroVenegas).
+:- use_module(tda_pixbit_comprimido_21090869_CastroVenegas).
+:- use_module(tda_pixhex_comprimido_21090869_CastroVenegas).
+:- use_module(tda_pixrgb_comprimido_21090869_CastroVenegas).
+
+:-module(tda_image_21090869_CastroVenegas, [image/4, imageIsBitmap/1, imageIsHexmap/1, imageIsPixmap/1,
+                                           imageIsCompress/1, imageFlipH/2, imageFlipV/2, imageCrop/6,
+                                           imageRGBToHex/2, imageInvertColorRGB/2, imageToHistogram/2,
+                                           imageRotate90/2, imageCompress/2, imageChangePixel/3, imageToString/2,
+                                            imageDepthLayers/2, imageDecompress/2]).
 
 
+% DOMINIO
+% Ancho = int >= 0
+% Largo = int >= 0
+%
+%
+%
+%
 % Descripción: Predicado que define como es una imagen
 % Dominio: int X int X list X variable (list)
 % Recorrido: image
@@ -33,11 +49,11 @@ imageIsHexmap(Imagen):- image(_,_,P, Imagen), esHexmap(P) -> true; false.
 % Recorrido: Boleano
 % Tipo: Pertenencia
 imageIsCompress(Imagen):-
-    obtenerPixeles(Imagen, P),
+    obtPixelesImage(Imagen, P),
     esHexmapComprimido(P) -> true;
-    obtenerPixeles(Imagen, P),
+    obtPixelesImage(Imagen, P),
     esPixmapComprimido(P) -> true;
-    obtenerPixeles(Imagen, P),
+    obtPixelesImage(Imagen, P),
     esBitmapComprimido(P) -> true; false.
 
 % Descripción: Predicado que verifica si la entrada es una imagen
@@ -52,8 +68,15 @@ esImage(Imagen):-
 % Dominio: image X variable (list)
 % Recorrido: list
 % Tipo: Selector
-obtenerPixeles(Imagen , Pixeles):-
+obtPixelesImage(Imagen , Pixeles):-
     image(_,_, Pixeles, Imagen).
+
+% Descripción: Predicado que obtiene las dimensiones de una imagen
+% Dominio: image X variable (int) X variable (int)
+% Recorrido: int y int
+% Tipo: Selector
+obtCoordImage(Imagen , CoordX, CoordY):-
+    image(CoordX,CoordY, _, Imagen).
 
 % Descripción: Predicado que verifica existencia de (x,y) en Pixel
 % cuando se cambie el formato de pixeles en la imagen
@@ -141,7 +164,8 @@ flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, Contador
 imageFlipH(Imagen, Imagen2):-
     imageIsCompress(Imagen) ->
         imageDecompress(Imagen, ImagenD),
-        image(CoordX, CoordY, Pixeles, ImagenD),
+        obtPixelesImage(ImagenD, Pixeles),
+        obtCoordImage(ImagenD, CoordX, CoordY),
         CoordY_final is CoordY-1,
         flipH_formato(Pixeles, Pixeles, CoordY_final, 0, 0, PixelesH),
         sort(PixelesH, PixelesH2),
@@ -149,7 +173,8 @@ imageFlipH(Imagen, Imagen2):-
         image(CoordX, CoordY, Pixeles2, Imagen2)
         ;
         esImage(Imagen),
-        image(CoordX, CoordY, Pixeles, Imagen),
+        obtPixelesImage(Imagen, Pixeles),
+        obtCoordImage(Imagen, CoordX, CoordY),
         CoordY_final is CoordY-1,
         flipH_formato(Pixeles, Pixeles, CoordY_final, 0, 0, PixelesH),
         sort(PixelesH, PixelesH2),
