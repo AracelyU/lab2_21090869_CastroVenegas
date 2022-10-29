@@ -1,3 +1,6 @@
+:- module(tda_image_21090869_castrovenegas, [image/4]).
+
+
 :- use_module(tda_pixbit_21090869_CastroVenegas).
 :- use_module(tda_pixhex_21090869_CastroVenegas).
 :- use_module(tda_pixrgb_21090869_CastroVenegas).
@@ -5,13 +8,14 @@
 :- use_module(tda_pixhex_comprimido_21090869_CastroVenegas).
 :- use_module(tda_pixrgb_comprimido_21090869_CastroVenegas).
 
-:-module(tda_image_21090869_CastroVenegas, [image/4, imageIsBitmap/1, imageIsHexmap/1, imageIsPixmap/1,
-                                           imageIsCompress/1, imageFlipH/2, imageFlipV/2, imageCrop/6,
-                                           imageRGBToHex/2, imageInvertColorRGB/2, imageToHistogram/2,
-                                           imageRotate90/2, imageCompress/2, imageChangePixel/3, imageToString/2,
-                                            imageDepthLayers/2, imageDecompress/2]).
 
-
+% DOMINIO
+% Ancho = int >= 0
+% Largo = int >= 0
+%
+%
+%
+%
 % Descripción: Predicado que define como es una imagen
 % Dominio: int X int X list X variable (list)
 % Recorrido: image
@@ -114,7 +118,7 @@ cambiarCoordXY(Pixel,X, Y, P):-
     integer(Y), Y >= 0, integer(X), X >= 0,
     esBitmap([Pixel]) -> obtProfundidadPixbit(Pixel, D), obtColorPixbit(Pixel, B), pixbit(X,Y,B,D, P);
     esHexmap([Pixel]) -> obtProfundidadPixhex(Pixel, D), obtColorPixhex(Pixel, H), pixhex(X,Y,H,D, P);
-    esPixmap([Pixel]) -> obtProfundidadPixhex(Pixel, D), obtColorPixrgb(Pixel, R,G,B), pixrgb(X,Y,R,G,B,D, P).
+    esPixmap([Pixel]) -> obtProfundidadPixrgb(Pixel, D), obtColorPixrgb(Pixel, R,G,B), pixrgb(X,Y,R,G,B,D, P).
 
 % Descripción: Predicado que eliminar las variables sin valor asignado
 % de la lista de pixeles tras flipH, flipV, entre otros
@@ -151,14 +155,12 @@ flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, Contador
 
 
 % Descripción: Predicado que voltea la imagen horizontalmente
-% Dominio: image X variable (image)
-% Recorrido: image
-% Tipo: Modificador
+% Dominio: imagen X variable
+% Recorrido: imagen
 imageFlipH(Imagen, Imagen2):-
     imageIsCompress(Imagen) ->
         imageDecompress(Imagen, ImagenD),
-        obtPixelesImage(ImagenD, Pixeles),
-        obtCoordImage(ImagenD, CoordX, CoordY),
+        image(CoordX, CoordY, Pixeles, ImagenD),
         CoordY_final is CoordY-1,
         flipH_formato(Pixeles, Pixeles, CoordY_final, 0, 0, PixelesH),
         sort(PixelesH, PixelesH2),
@@ -166,13 +168,13 @@ imageFlipH(Imagen, Imagen2):-
         image(CoordX, CoordY, Pixeles2, Imagen2)
         ;
         esImage(Imagen),
-        obtPixelesImage(Imagen, Pixeles),
-        obtCoordImage(Imagen, CoordX, CoordY),
+        image(CoordX, CoordY, Pixeles, Imagen),
         CoordY_final is CoordY-1,
         flipH_formato(Pixeles, Pixeles, CoordY_final, 0, 0, PixelesH),
         sort(PixelesH, PixelesH2),
         removerElemento([], PixelesH2, Pixeles2),
         image(CoordX, CoordY, Pixeles2, Imagen2).
+
 
 % Descripción: Predicado que voltea los pixeles verticalmente ,apoya a
 % imageFlipV
@@ -182,19 +184,19 @@ imageFlipH(Imagen, Imagen2):-
 % Tipo de recursión: Natural, pues crea una lista con base a estados
 % pendientes
 flipV_formato(_ ,[], _, _, _,_,[]).
-flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, CoordY, CoordY_final, Contador, [NuevaCabeza | Cola2]):-
-    existeCoordXY([CabezaC | ColaC], Contador, CoordY) ->
-        R is CoordX_final-Contador,
+flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, CoordX, CoordY, CoordY_final, [NuevaCabeza | Cola2]):-
+    existeCoordXY([CabezaC | ColaC], CoordX, CoordY) ->
+        R is CoordX_final-CoordX,
         R1 is CoordY+1,
-        cambiarCoordXY(Cabeza, R, CoordY, NuevaCabeza),
-        flipV_formato([CabezaC | ColaC], Cola, CoordX_final, R1, CoordY_final, Contador, Cola2)
+        cambiarCoordXY(Cabeza, CoordY, R, NuevaCabeza),
+        flipV_formato([CabezaC | ColaC], Cola, CoordX_final, CoordX, R1, CoordY_final, Cola2)
         ;
         (CoordY > CoordY_final) ->
-            R2 is Contador+1,
-            flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, 0, CoordY_final, R2, Cola2)
+            R2 is CoordX+1,
+            flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, R2, 0, CoordY_final, Cola2)
             ;
             R3 is CoordY+1,
-            flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, R3, CoordY_final, Contador, Cola2).
+            flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, CoordX, R3, CoordY_final, Cola2).
 
 % Descripción: Predicado que voltea la imagen verticalmente
 % Dominio: image X variable (image)
@@ -209,15 +211,15 @@ imageFlipV(Imagen, Imagen2):-
         sort(PixelesV, PixelesV2),
         removerElemento([], PixelesV2, Pixeles2),
         image(CoordX, CoordY, Pixeles2, Imagen2)
-       ;
-       esImage(Imagen),
-       image(CoordX, CoordY, Pixeles, Imagen),
-       CoordX_final is CoordX-1,
-       CoordY_final is CoordY-1,
-       flipV_formato(Pixeles, Pixeles, CoordX_final, 0, 0, CoordY_final, PixelesV),
-       sort(PixelesV, PixelesV2),
-       removerElemento([], PixelesV2, Pixeles2),
-       image(CoordX, CoordY, Pixeles2, Imagen2).
+        ;
+        esImage(Imagen),
+        image(CoordX, CoordY, Pixeles, Imagen),
+        CoordX_final is CoordX-1,
+        CoordY_final is CoordY-1,
+        flipV_formato(Pixeles, Pixeles, CoordX_final, 0, 0, CoordY_final, PixelesV),
+        sort(PixelesV, PixelesV2),
+        removerElemento([], PixelesV2, Pixeles2),
+        image(CoordX, CoordY, Pixeles2, Imagen2).
 
 
 % Descripción: Predicado que crea eliminar los pixeles que no esten en

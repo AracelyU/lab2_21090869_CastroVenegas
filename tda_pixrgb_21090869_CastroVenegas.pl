@@ -1,6 +1,5 @@
-:- module(tda_pixrgb_21090869_CastroVenegas, [pixrgb/7, pixrgb_comprimido/7,
-                                             esPixmap/1, esPixmapComprimido/1,
-                                             obtCoordPixrgb/3, obtColorPixrgb/4,
+:- module(tda_pixrgb_21090869_CastroVenegas, [pixrgb/7,
+                                             esPixmap/1, obtCoordPixrgb/3, obtColorPixrgb/4,
                                              obtProfundidadPixrgb/2]).
 
 

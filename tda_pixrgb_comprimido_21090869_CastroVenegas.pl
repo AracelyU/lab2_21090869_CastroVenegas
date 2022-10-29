@@ -1,7 +1,8 @@
-:- module(tda_pixrgb_21090869_CastroVenegas, [pixrgb_comprimido/7,
-                                             esPixmapComprimido/1,
-                                             obtCoordPixrgbC/3, obtColorPixrgbC/4,
-                                             obtProfundidadPixrgbC/2]).
+:- module(tda_pixrgb_comprimido_21090869_CastroVenegas, [pixrgb_comprimido/7,
+                                              esPixmapComprimido/1,
+                                              obtCoordPixrgbC/3,
+                                              obtColorPixrgbC/4,
+                                              obtProfundidadPixrgbC/2]).
 
 
 % Descripción: Predicado que define como es un pixrgb_comprimido
@@ -23,7 +24,6 @@ esPixmapComprimido([Cabeza | Cola]):-
     is_list(Cabeza), length(Cabeza, N), N == 6,
     pixrgb_comprimido(X,Y,R,G,B,D, Cabeza), pixrgb_comprimido(X,Y,R,G,B,D, P),
     P \== false -> true; esPixmapComprimido(Cola).
-
 
 % Descripción: Predicado que obtiene la coordenadas (X,Y) de un
 % pixrgb_comprimido

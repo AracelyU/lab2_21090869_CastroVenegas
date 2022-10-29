@@ -1,0 +1,30 @@
+Requerimiento No Funcionales    Evaluación (criterio)
+Autoevaluación			1
+Lenguaje			1
+Versión				1
+Standard			1
+Documentación			1
+Organización			1
+Historial			1
+Script de pruebas		1
+Prerrequisitos			1
+
+Requerimientos Funcionales	Evaluación (criterio)
+TDAs                            1
+image                           1
+imageIsBitmap                   1
+imageIsPixmap                   1
+imageIsHexmap                   1
+imageIsCompress                 1
+imageFlipH                      1
+imageFlipV                      1
+imageCrop                       1
+imageRGBToHex                   1
+imageToHistogram                1
+imageRotate90                   1
+imageCompress                   1  
+imageChangePixel                1
+imageInvertColorRG              1
+imageToString                   1
+imageDepthLayers                1
+imageDecompress                 1
