@@ -26,9 +26,14 @@
 
 
 % DOMINIO
+% Imagen = image
 % Ancho = int >= 0
 % Largo = int >= 0
-%
+% Pixeles = list [pixbit | pixhex | pixrgb]Y
+% Pixel = [pixbit | pixhex | pixrgb]
+% CoordX = X = int >= 0
+% CoordY = Y = int >= 0
+% Contador = int
 %
 %
 %
@@ -36,38 +41,35 @@
 % Dominio: int X int X list X variable (list)
 % Recorrido: image
 % Tipo: Constructor
-image(Ancho, Largo, Pixel, [Ancho, Largo, Pixel]):-
-    integer(Ancho),Ancho >= 0, integer(Largo), Largo >= 0, is_list(Pixel).
+image(Ancho, Largo, Pixeles, [Ancho, Largo, Pixeles]):-
+    integer(Ancho),Ancho >= 0, integer(Largo), Largo >= 0, is_list(Pixeles).
 
 % Descripción: Predicado que verifica si una imagen es Bitmap
 % Dominio: image
 % Recorrido: Boleano
 % Tipo: Pertenencia
-imageIsBitmap(Imagen):- image(_,_,P, Imagen), esBitmap(P) -> true; false.
+imageIsBitmap(Imagen):- obtPixelesImage(Imagen, Pixeles), esBitmap(Pixeles) -> true; false.
 
 % Descripión: Predicado que verifica si una imagen es Pixmap
 % Dominio: image
 % Recorrido: Boleano
 % Tipo: Pertenencia
-imageIsPixmap(Imagen):- image(_,_,P, Imagen), esPixmap(P) -> true; false.
+imageIsPixmap(Imagen):- obtPixelesImage(Imagen, Pixeles), esPixmap(Pixeles) -> true; false.
 
 % Descripción: Predicado que verifica si una imagen es Hexmap
 % Dominio: image
 % Recorrido: Boleano
 % Tipo: Pertenencia
-imageIsHexmap(Imagen):- image(_,_,P, Imagen), esHexmap(P) -> true; false.
+imageIsHexmap(Imagen):- obtPixelesImage(Imagen, Pixeles), esHexmap(Pixeles) -> true; false.
 
 % Descripción: Predicado que verifica si una imagen fue comprimida
 % Dominio: image
 % Recorrido: Boleano
 % Tipo: Pertenencia
 imageIsCompress(Imagen):-
-    obtPixelesImage(Imagen, P),
-    esHexmapComprimido(P) -> true;
-    obtPixelesImage(Imagen, P),
-    esPixmapComprimido(P) -> true;
-    obtPixelesImage(Imagen, P),
-    esBitmapComprimido(P) -> true; false.
+    obtPixelesImage(Imagen, Pixeles), esHexmapComprimido(Pixeles) -> true;
+    obtPixelesImage(Imagen, Pixeles), esPixmapComprimido(Pixeles) -> true;
+    obtPixelesImage(Imagen, Pixeles), esBitmapComprimido(Pixeles) -> true; false.
 
 % Descripción: Predicado que verifica si la entrada es una imagen
 % Dominio: image
@@ -81,50 +83,25 @@ esImage(Imagen):-
 % Dominio: image X variable (list)
 % Recorrido: list
 % Tipo: Selector
-obtPixelesImage(Imagen , Pixeles):-
-    image(_,_, Pixeles, Imagen).
+obtPixelesImage(Imagen , Pixeles):- image(_,_, Pixeles, Imagen).
 
 % Descripción: Predicado que obtiene las dimensiones de una imagen
 % Dominio: image X variable (int) X variable (int)
 % Recorrido: int y int
 % Tipo: Selector
-obtCoordImage(Imagen , CoordX, CoordY):-
-    image(CoordX,CoordY, _, Imagen).
+obtCoordImage(Imagen , Ancho, Largo):- image(Ancho,Largo, _, Imagen).
 
-% Descripción: Predicado que verifica si el Pixel esta dentro del rango
-% dado por crop
-% Dominio: Pixel X int X int X int X int
-% Recorrido: Boleano
-% Tipo: Otras funciones
-rangoXY(Pixel, X1,X2,Y1,Y2):-
-    esBitmap([Pixel]) -> obtCoordPixbit(Pixel, X, Y),
-        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false;
-    esHexmap([Pixel]) -> obtCoordPixhex(Pixel, X, Y),
-        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false;
-    esPixmap([Pixel]) -> obtCoordPixrgb(Pixel, X, Y),
-        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false.
 
 % Descripción: Predicado que modifica CoordX y CoordY de un Pixel para
 % flipH, flipV entre otros
 % Dominio: Pixel X int X int X variable
 % (Pixel) Recorrido: Pixel
 % Tipo: Otras funciones
-cambiarCoordXY(Pixel, X, Y, P):-
+cambiarCoordXY(Pixel, X, Y, Pixel2):-
     integer(Y), Y >= 0, integer(X), X >= 0,
-    esBitmap([Pixel]) -> obtProfundidadPixbit(Pixel, D), obtColorPixbit(Pixel, B), pixbit(X,Y,B,D, P);
-    esHexmap([Pixel]) -> obtProfundidadPixhex(Pixel, D), obtColorPixhex(Pixel, H), pixhex(X,Y,H,D, P);
-    esPixmap([Pixel]) -> obtProfundidadPixrgb(Pixel, D), obtColorPixrgb(Pixel, R,G,B), pixrgb(X,Y,R,G,B,D, P).
-
-% Descripción: Predicado que eliminar las variables sin valor asignado
-% de la lista de pixeles tras flipH, flipV, entre otros
-% Dominio: elemento X list X variable (list).
-% Recorrido: list
-% Tipo: Otras funciones
-removerElemento(_, [], []).
-removerElemento(Y, [Y|Xs], Zs):-
-          removerElemento(Y, Xs, Zs), !.
-removerElemento(X, [Y|Xs], [Y|Zs]):-
-          removerElemento(X, Xs, Zs).
+    esBitmap([Pixel]) -> obtProfundidadPixbit(Pixel, D), obtColorPixbit(Pixel, B), pixbit(X,Y,B,D, Pixel2);
+    esHexmap([Pixel]) -> obtProfundidadPixhex(Pixel, D), obtColorPixhex(Pixel, H), pixhex(X,Y,H,D, Pixel2);
+    esPixmap([Pixel]) -> obtProfundidadPixrgb(Pixel, D), obtColorPixrgb(Pixel, R,G,B), pixrgb(X,Y,R,G,B,D, Pixel2).
 
 
 % Descripción: Predicado que voltea los pixeles horizontalmente, apoya a
@@ -151,18 +128,18 @@ flipH_formato([Cabeza | Cola], CoordY_final, CoordX, Contador, [NuevaCabeza | Co
 imageFlipH(Imagen, Imagen2):-
     imageIsCompress(Imagen) ->
         imageDecompress(Imagen, ImagenD),
-        image(CoordX, CoordY, Pixeles, ImagenD),
-        CoordY_final is CoordY-1,
+        obtCoordImage(ImagenD, Ancho, Largo), obtPixelesImage(ImagenD, Pixeles),
+        CoordY_final is Largo-1,
         flipH_formato(Pixeles, CoordY_final, 0, 0, PixelesH),
         sort(PixelesH, Pixeles2),
-        image(CoordX, CoordY, Pixeles2, Imagen2)
+        image(Ancho, Largo, Pixeles2, Imagen2)
         ;
         esImage(Imagen),
-        image(CoordX, CoordY, Pixeles, Imagen),
-        CoordY_final is CoordY-1,
+        obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
+        CoordY_final is Largo-1,
         flipH_formato(Pixeles, CoordY_final, 0, 0, PixelesH),
         sort(PixelesH, Pixeles2),
-        image(CoordX, CoordY, Pixeles2, Imagen2).
+        image(Ancho, Largo, Pixeles2, Imagen2).
 
 
 % Descripción: Predicado que voltea los pixeles verticalmente ,apoya a
@@ -191,36 +168,46 @@ flipV_formato([Cabeza | Cola], CoordX_final, CoordX, CoordY, CoordY_final, [Nuev
 imageFlipV(Imagen, Imagen2):-
     imageIsCompress(Imagen) ->
         imageDecompress(Imagen, ImagenD),
-        image(CoordX, CoordY, Pixeles, ImagenD),
-        CoordX_final is CoordX-1, CoordY_final is CoordY-1,
+        obtCoordImage(ImagenD, Ancho, Largo), obtPixelesImage(ImagenD, Pixeles),
+        CoordX_final is Ancho-1, CoordY_final is Largo-1,
         flipV_formato(Pixeles, CoordX_final, 0, 0, CoordY_final, PixelesV),
         sort(PixelesV, Pixeles2),
-        image(CoordX, CoordY, Pixeles2, Imagen2)
+        image(Ancho, Largo, Pixeles2, Imagen2)
         ;
         esImage(Imagen),
-        image(CoordX, CoordY, Pixeles, Imagen),
-        CoordX_final is CoordX-1,
-        CoordY_final is CoordY-1,
+        obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
+        CoordX_final is Ancho-1,
+        CoordY_final is Largo-1,
         flipV_formato(Pixeles, CoordX_final, 0, 0, CoordY_final, PixelesV),
         sort(PixelesV, Pixeles2),
-        image(CoordX, CoordY, Pixeles2, Imagen2).
+        image(Ancho, Largo, Pixeles2, Imagen2).
 
+% Descripción: Predicado que verifica si el Pixel esta dentro del rango
+% dado por crop
+% Dominio: Pixel X int X int X int X int
+% Recorrido: Boleano
+% Tipo: Otras funciones
+rangoXY(Pixel, X1,X2,Y1,Y2):-
+    esBitmap([Pixel]) -> obtCoordPixbit(Pixel, X, Y),
+        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false;
+    esHexmap([Pixel]) -> obtCoordPixhex(Pixel, X, Y),
+        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false;
+    esPixmap([Pixel]) -> obtCoordPixrgb(Pixel, X, Y),
+        ((X >= X1), (X =< X2), (Y >= Y1), (Y =< Y2)) -> true; false.
 
 % Descripción: Predicado que crea eliminar los pixeles que no esten en
-% el rango establecido por imageCrop
-% Dominio: list X int X int x int X int X variable (list)
-% Recorrido: list
-% Tipo: Otras funciones
-% Tipo de recursión: Natural, pues crea una lista con base a estados
+% el rango establecido por imageCrop Dominio: list X int X int x int X
+% int X variable (list) Recorrido: list Tipo: Otras funciones Tipo de
+% recursión: Natural, pues crea una lista con base a estados
 % pendientes
-crop_filtro([], _,_, _, _, []).
-crop_filtro([Cabeza | Cola], X1, X2, Y1, Y2, [Cabeza2 | Cola2]):-
-     rangoXY(Cabeza, X1, X2, Y1, Y2) ->
-            %append(Cabeza, [], Cabeza2),
-            Cabeza2 = Cabeza, write(Cabeza),
-            crop_filtro(Cola, X1, X2, Y1, Y2, Cola2)
-            ;
-            crop_filtro(Cola, X1, X2, Y1, Y2, [Cabeza2 | Cola2]).
+crop_filtro([], _,_,_,_,[]).
+crop_filtro([Cabeza | Cola], X1,X2,Y1,Y2, [NuevaCabeza | Cola2]):-
+      rangoXY(Cabeza, X1,X2,Y1,Y2) ->
+          NuevaCabeza = [1, Cabeza],
+          crop_filtro(Cola, X1,X2,Y1,Y2, Cola2);
+          NuevaCabeza = [0, Cabeza],
+          crop_filtro(Cola, X1,X2,Y1,Y2, Cola2).
+
 
 crop_formato([], _,_,_,[]).
 crop_formato([Cabeza | Cola], CoordX, CoordY, CoordY_final, [NuevaCabeza | Cola2]):-
@@ -232,7 +219,7 @@ crop_formato([Cabeza | Cola], CoordX, CoordY, CoordY_final, [NuevaCabeza | Cola2
         crop_formato(Cola, CoordX, R, CoordY_final, Cola2);
 
         R2 is CoordX+1,
-        crop_formato([Cabeza | Cola], R2, 0, CoordY_final, Cola2).
+        crop_formato([Cabeza | Cola], R2, 0, CoordY_final, [NuevaCabeza | Cola2]).
 
 % Descripción: Predicado que devuelve el mayor entre dos números, apoya
 % a imageCrop
@@ -246,7 +233,6 @@ mayor(A,B,C):- A >= B -> C is A ; C is B.
 % Tipo: Otras funciones
 menor(A,B,C):- A =< B -> C is A ; C is B.
 
-
 % Descripción: Predicado que elimina los pixeles de una imagen que no
 % esten en el cuadrante definido
 % Dominio: image X int X int X int X int X variable (image)
@@ -254,41 +240,28 @@ menor(A,B,C):- A =< B -> C is A ; C is B.
 % Tipo: Modificador
 imageCrop(Imagen, X1,Y1,X2,Y2,Imagen2):-
    imageIsCompress(Imagen) ->
-       imageDecompress(Imagen, ImagenD),
-       image(_, _, Pixeles, ImagenD),
+       imageDecompress(Imagen, ImagenD), obtPixelesImage(ImagenD, Pixeles),
        menor(X1,X2,X_menor), mayor(X1,X2,X_mayor), menor(Y1,Y2,Y_menor), mayor(Y1,Y2,Y_mayor),
        crop_filtro(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC),
-       removerElemento([], PixelesC, PixelesC2),
+       eliminarElemento(0, PixelesC, PixelesC2),
        CoordY_final is Y_mayor - Y_menor,
-       crop_formato(PixelesC2, 0,0, CoordY_final, PixelesC3),
-       removerElemento([], PixelesC3, Pixeles2),
+       crop_formato(PixelesC2, 0,0, CoordY_final, Pixeles2),
        CoordX is X_mayor - X_menor,
        CoordXNuevo is CoordX + 1,
-       CoordYNuevo is CoordY_final +1,
+       CoordYNuevo is CoordY_final + 1,
        image(CoordXNuevo, CoordYNuevo, Pixeles2, Imagen2)
        ;
        esImage(Imagen),
        image(_, _, Pixeles, Imagen),
        menor(X1,X2,X_menor), mayor(X1,X2,X_mayor), menor(Y1,Y2,Y_menor), mayor(Y1,Y2,Y_mayor),
-       crop_filtro(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC), removerElemento([], PixelesC, PixelesC2),
+       crop_filtro(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC),
+       eliminarElemento(0, PixelesC, PixelesC2),
        CoordY_final is Y_mayor - Y_menor,
-       crop_formato(PixelesC2, 0,0, CoordY_final, PixelesC3),
-       removerElemento([], PixelesC3, Pixeles2),
+       crop_formato(PixelesC2, 0,0, CoordY_final, Pixeles2),
        CoordX is X_mayor - X_menor,
        CoordXNuevo is CoordX + 1,
-       CoordYNuevo is CoordY_final +1,
+       CoordYNuevo is CoordY_final + 1,
        image(CoordXNuevo, CoordYNuevo, Pixeles2, Imagen2).
-
-% Descripción: Predicado que entrega el equivalente a entero de un
-% string, apoya en imageCompress
-% Dominio: string X variable (int)
-% Recorrido: int
-% Tipo: Otras funciones
-stringNumero(String, Num):-
-    (String = "0"), Num = 0; (String = "1"), Num = 1; (String = "2"), Num = 2; (String = "3"), Num = 3;
-    (String = "4"), Num = 4; (String = "5"), Num = 5; (String = "6"), Num = 6; (String = "7"), Num = 7;
-    (String = "8"), Num = 8; (String = "9"), Num = 9; (String = "A"), Num = 10; (String = "B"), Num = 11;
-    (String = "C"), Num = 12; (String = "D"), Num = 13, (String = "E"), Num = 14; (String = "F"), Num = 15.
 
 
 % Descripción: Predicado que entrega el equivalente a string de un
@@ -302,28 +275,6 @@ numeroString(Num, String):-
     (Num = 8), String = "8"; (Num = 9), String = "9"; (Num = 10), String = "A"; (Num = 11), String = "B";
     (Num = 12), String = "C"; (Num = 13), String = "D"; (Num = 14), String = "E"; (Num = 15), String = "F".
 
-% Descripción: Predicado que convierte un string pixhex en una lista de
-% tres valores enteros
-% Dominio: string X variable (int)
-% Recorrido: int
-% Tipo: Otras funciones
-listHEX_RGB(String, [R, G, B]):-
-    sub_string(String,1,_,4,S1),
-    hexRGB(S1,R),
-    sub_string(String,3,_,2,S2),
-    hexRGB(S2,G),
-    sub_string(String,5,_,0,S3),
-    hexRGB(S3,B).
-
-% Descripción: Predicado que convierte una lista de 3 valores pixmap a string hexmap
-% Dominio: list X variable (string)
-% Recorrido: string
-% Tipo: Otras funciones
-listRGB_HEX([R, G, B], ColorHex):-
-    rgbHex(R, R_hex), rgbHex(G, G_hex), rgbHex(B, B_hex),
-    string_concat("#", R_hex, ColorParcial), string_concat(G_hex, B_hex, ColorParcial2),
-    string_concat(ColorParcial, ColorParcial2, ColorHex).
-
 % Descripción: Predicado que transforma un número con unidad y decena a
 % su equivalente string
 % Dominio: int X variable (String)
@@ -334,26 +285,14 @@ rgbHex(Num, String):-
     numeroString(Entero, N1), numeroString(Resto, N2),
     string_concat(N1,N2, String).
 
-% Descripción: Predicado que transforma un string con dos letras a su
-% equivalente a número, apoya a imageCompress
-% Dominio: string X variable (int)
-% Recorrido: int
+% Descripción: Predicado que convierte una lista de 3 valores pixmap a string hexmap
+% Dominio: list X variable (string)
+% Recorrido: string
 % Tipo: Otras funciones
-hexRGB(String, Color):-
-    sub_string(String,0,_,1,S1),
-    (S1 = "0") ->
-        sub_string(String,1,_,0,S2), stringNumero(S2,N2),
-        Color is N2
-        ;
-        sub_string(String,1,_,0,S2),
-        (S2 = "0") ->
-            sub_string(String,0,_,1,S1), stringNumero(S1,N1),
-            Color is N1 * 16
-            ;
-            sub_string(String,0,_,1,S1), sub_string(String,1,_,0,S2),
-            stringNumero(S1,N1), stringNumero(S2,N2),
-            Color is N1 + N2 * 16.
-
+listRGB_HEX([R, G, B], ColorHex):-
+    rgbHex(R, R_hex), rgbHex(G, G_hex), rgbHex(B, B_hex),
+    string_concat("#", R_hex, ColorParcial), string_concat(G_hex, B_hex, ColorParcial2),
+    string_concat(ColorParcial, ColorParcial2, ColorHex).
 
 % Descripción: Predicado que convierte un pixmap a hexmap
 % Dominio: pixrgb x variable (pixhex)
@@ -383,15 +322,15 @@ formatoRGB_HEX([Cabeza | Cola], [NuevaCabeza | Cola2]):-
 imageRGBToHex(Imagen, Imagen2):-
     imageIsCompress(Imagen) ->
        imageDecompress(Imagen, ImagenD),
-       image(CoordX, CoordY, Pixeles, ImagenD),
+       obtCoordImage(ImagenD, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
        esPixmap(Pixeles),
        formatoRGB_HEX(Pixeles, Pixeles2),
-       image(CoordX, CoordY, Pixeles2, Imagen2)
+       image(Ancho, Largo, Pixeles2, Imagen2)
        ;
-       image(CoordX, CoordY, Pixeles, Imagen),
+       obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
        esPixmap(Pixeles),
        formatoRGB_HEX(Pixeles, Pixeles2),
-       image(CoordX, CoordY, Pixeles2, Imagen2).
+       image(Ancho, Largo, Pixeles2, Imagen2).
 
 % Descripción: Predicado que cambia un pixrgb por su color opuesto
 % Dominio: pixrgb X variable (pixrgb)
@@ -408,42 +347,28 @@ imageInvertColorRGB(Pixel, Pixel2):-
 % Recorrido: Boleano
 % Tipo: Otras funciones
 igualColor(Pixel, Pixel2):-
-    esBitmap([Pixel, Pixel2]) ->
-        obtColorPixbit(Pixel, B), obtColorPixbit(Pixel2,B) -> true; false
-   ;
-    esHexmap([Pixel, Pixel2]) ->
-        obtColorPixhex(Pixel, B), obtColorPixhex(Pixel2,B) -> true; false
-   ;
-    esPixmap([Pixel, Pixel2]) ->
-        obtColorPixrgb(Pixel, R,G,B), obtColorPixrgb(Pixel2, R,G,B) -> true; false
-   ;
-   false.
+    esBitmap([Pixel, Pixel2]) -> obtColorPixbit(Pixel, B), obtColorPixbit(Pixel2,B) -> true; false;
+    esHexmap([Pixel, Pixel2]) -> obtColorPixhex(Pixel, B), obtColorPixhex(Pixel2,B) -> true; false;
+    esPixmap([Pixel, Pixel2]) -> obtColorPixrgb(Pixel, R,G,B), obtColorPixrgb(Pixel2, R,G,B) -> true; false; false.
 
-% Descripción: Predicado que eliminar un color de una lista de pixeles
-% Dominio: list X Pixel X variable (list)
+% Descripción: Predicado que filtra pixeles según elemento
+% Dominio: Elemento [int | string | list] X list X variable (list)
 % Recorrido: list
-% Tipo de recursión: Natural, pues crea una nueva lista con base a
-% estados pendientes
-% Tipo: Otras funciones
-eliminarColor([], _, []):- !.
-eliminarColor([Cabeza | Cola], Pixel, [NuevaCabeza | Cola2]):-
-    igualColor(Cabeza, Pixel) ->
-        eliminarColor(Cola, Pixel, Cola2);
-        append(Cabeza, [], NuevaCabeza),
-        eliminarColor(Cola, Pixel, Cola2).
+eliminarElemento(_,[],[]).
+eliminarElemento(Elemento, [[Elemento , _] | Cola], Cola2):-
+    eliminarElemento(Elemento, Cola, Cola2), !.
+eliminarElemento(ColorN, [[_ , Cabeza] | Cola], [Cabeza | Cola2]):-
+    eliminarElemento(ColorN, Cola, Cola2).
 
+% Descripción: Predicado que modifica los pixeles para eliminarElemento
+% Dominio: list X variable (list)
+% Recorrido: list
+listaEliminarColor([], []).
+listaEliminarColor([Cabeza | Cola], [NuevaCabeza | Cola2]):-
+    colorPixel(Cabeza, Color),
+    NuevaCabeza = [Color, Cabeza],
+    listaEliminarColor(Cola, Cola2).
 
-% Descripción: Predicado que verifica si es un pixrgb, pixhex o pixbit
-% Dominio: Pixel
-% Recorrido: Boleano
-% Tipo: Otras funciones
-esPixel(Elemento):-
-    esBitmapComprimido([Elemento]) -> false;
-    esPixmapComprimido([Elemento]) -> false;
-    esHexmapComprimido([Elemento]) -> false;
-    esBitmap([Elemento]) -> true;
-    esPixmap([Elemento]) -> true;
-    esHexmap([Elemento]) -> true; false.
 
 % Descripción: Predicado que suma los elementos iguales de pixeles
 % Dominio: list X Pixel X variable (int)
@@ -456,6 +381,14 @@ contarColor([Cabeza | Cola], Pixel, C):-
         !, contarColor(Cola, Pixel, C1), C is C1+1;
         contarColor(Cola, Pixel, C).
 
+% Descripción: Predicado que obtiene el color de un pixel
+% Dominio: Pixel X variable (string | int | list)
+% Recorrido: string | int | list
+% Tipo: Otras funciones
+colorPixel(Pixel, Color):-
+    esBitmap([Pixel]) -> obtColorPixbit(Pixel, Color);
+    esHexmap([Pixel]) -> obtColorPixhex(Pixel, Color);
+    esPixmap([Pixel]) -> obtColorPixrgb(Pixel, R,G,B), Color = [R,G,B].
 
 % Descripción: Predicado que recopila la información de color de los pixeles
 % Dominio: list X variable (list)
@@ -465,10 +398,10 @@ contarColor([Cabeza | Cola], Pixel, C):-
 % pendientes
 histograma_formato([], []).
 histograma_formato([Cabeza | Cola], [[Cantidad , Elemento] | Cola2]):-
-        colorPixel(Cabeza, Elemento), write("\nColor="), write(Elemento),
-        contarColor([Cabeza | Cola], Cabeza, Cantidad), write("\nContador="), write(Cantidad),
-        eliminarColor([Cabeza | Cola], Cabeza, NuevaLista2), write("\nNuevaLista="), write(NuevaLista),
-        removerElemento([], NuevaLista2, NuevaLista),
+        colorPixel(Cabeza, Elemento),
+        contarColor([Cabeza | Cola], Cabeza, Cantidad),
+        listaEliminarColor([Cabeza | Cola], ListaAEliminar),
+        eliminarElemento(Elemento, ListaAEliminar, NuevaLista),
         histograma_formato(NuevaLista, Cola2).
 
 % Descripción: Predicado que obtiene el histograma de una imagen
@@ -478,12 +411,12 @@ histograma_formato([Cabeza | Cola], [[Cantidad , Elemento] | Cola2]):-
 imageToHistogram(Imagen, Histograma):-
     imageIsCompress(Imagen) ->
        imageDecompress(Imagen, ImagenD),
-       image(_, _, Pixeles, ImagenD),
-       histograma_formato(Pixeles, H), removerElemento([], H, Histograma)
+       obtPixelesImage(ImagenD, Pixeles),
+       histograma_formato(Pixeles, Histograma)
        ;
        esImage(Imagen),
-       image(_,_,Pixeles, Imagen), histograma_formato(Pixeles, H),
-       removerElemento([], H, Histograma).
+       obtPixelesImage(Imagen, Pixeles),
+       histograma_formato(Pixeles, Histograma).
 
 % Descripción: Predicado que modifica los pixeles de una imagen rotando 90° a la derecha
 % Dominio: list X list X int X int X int X int X variable (list)
@@ -509,31 +442,63 @@ rotate90_formato([Cabeza | Cola], CoordX, Contador, CoordX_final, CoordY_final, 
 imageRotate90(Imagen, Imagen2):-
     imageIsCompress(Imagen) ->
        imageDecompress(Imagen, ImagenD),
-       image(CoordX, CoordY, Pixeles, ImagenD),
-       CoordX_final is CoordY-1, CoordY_final is CoordX-1,
+       obtCoordImage(ImagenD, Ancho, Largo), obtPixelesImage(ImagenD, Pixeles),
+       CoordX_final is Largo-1, CoordY_final is Ancho-1,
        rotate90_formato(Pixeles, 0,0, CoordX_final, CoordY_final, PixelesR),
        sort(PixelesR, Pixeles2),
-       image(CoordY, CoordX, Pixeles2, Imagen2)
+       image(Largo, Ancho, Pixeles2, Imagen2)
        ;
        esImage(Imagen),
-       image(CoordX, CoordY, Pixeles, Imagen),
-       CoordX_final is CoordY-1, CoordY_final is CoordX-1,
+       obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
+       CoordX_final is Largo-1, CoordY_final is Ancho-1,
        rotate90_formato(Pixeles, 0,0, CoordX_final, CoordY_final, PixelesR),
        sort(PixelesR, Pixeles2),
-       image(CoordY, CoordX, Pixeles2, Imagen2).
+       image(Largo, Ancho, Pixeles2, Imagen2).
 
-% Descripción: Predicado que obtiene el pixel más repetido
-% Dominio: list x variable (Pixel)
-% Recorrido: Pixel
+
+% Descripción: Predicado que entrega el equivalente a entero de un
+% string, apoya en imageCompress
+% Dominio: string X variable (int)
+% Recorrido: int
 % Tipo: Otras funciones
-% Tipo de recursión: Cola, entrega resultado inmediato
-pixelMasRepetido([], _, E, Elemento):- Elemento = E.
-pixelMasRepetido([Cabeza | Cola], Cant, Elem, Elemento):-
-    [Cantidad , _] = Cabeza,
-    (Cantidad > Cant) ->
-        [Cantidad, E] = Cabeza,
-        pixelMasRepetido(Cola, Cantidad, E, Elemento);
-        pixelMasRepetido(Cola, Cant, Elem, Elemento).
+stringNumero(String, Num):-
+    (String = "0"), Num = 0; (String = "1"), Num = 1; (String = "2"), Num = 2; (String = "3"), Num = 3;
+    (String = "4"), Num = 4; (String = "5"), Num = 5; (String = "6"), Num = 6; (String = "7"), Num = 7;
+    (String = "8"), Num = 8; (String = "9"), Num = 9; (String = "A"), Num = 10; (String = "B"), Num = 11;
+    (String = "C"), Num = 12; (String = "D"), Num = 13, (String = "E"), Num = 14; (String = "F"), Num = 15.
+
+% Descripción: Predicado que transforma un string con dos letras a su
+% equivalente a número, apoya a imageCompress
+% Dominio: string X variable (int)
+% Recorrido: int
+% Tipo: Otras funciones
+hexRGB(String, Color):-
+    sub_string(String,0,_,1,S1),
+    (S1 = "0") ->
+        sub_string(String,1,_,0,S2), stringNumero(S2,N2),
+        Color is N2
+        ;
+        sub_string(String,1,_,0,S2),
+        (S2 = "0") ->
+            sub_string(String,0,_,1,S1), stringNumero(S1,N1),
+            Color is N1 * 16
+            ;
+            sub_string(String,0,_,1,S1), sub_string(String,1,_,0,S2),
+            stringNumero(S1,N1), stringNumero(S2,N2),
+            Color is N1 + N2 * 16.
+
+% Descripción: Predicado que convierte un string pixhex en una lista de
+% tres valores enteros
+% Dominio: string X variable (int)
+% Recorrido: int
+% Tipo: Otras funciones
+listHEX_RGB(String, [R, G, B]):-
+    sub_string(String,1,_,4,S1),
+    hexRGB(S1,R),
+    sub_string(String,3,_,2,S2),
+    hexRGB(S2,G),
+    sub_string(String,5,_,0,S3),
+    hexRGB(S3,B).
 
 
 % Descripción: Predicado que comprime un pixel
@@ -541,17 +506,14 @@ pixelMasRepetido([Cabeza | Cola], Cant, Elem, Elemento):-
 % Recorrido: Pixel_comprimido
 comprimirPixel(Pixel, Pixel2):-
     esBitmap([Pixel]) ->
-        obtProfundidadPixbit(Pixel, D), obtCoordPixbit(Pixel, X,Y), obtColorPixbit(Pixel, B),
-        pixbit_comprimido(X,Y,[-1, B],D,Pixel2);
+        obtProfundidadPixbit(Pixel, D), obtCoordPixbit(Pixel, X,Y),
+        obtColorPixbit(Pixel, B), pixbit_comprimido(X,Y,[-1, B],D,Pixel2);
     esHexmap([Pixel]) ->
-        obtProfundidadPixhex(Pixel, D), obtCoordPixhex(Pixel, X,Y), obtColorPixhex(Pixel, S),
-        listHEX_RGB(S, H), pixhex_comprimido(X,Y,H,D,Pixel2);
+        obtProfundidadPixhex(Pixel, D), obtCoordPixhex(Pixel, X,Y),
+        obtColorPixhex(Pixel, S), listHEX_RGB(S, H), pixhex_comprimido(X,Y,H,D,Pixel2);
     esPixmap([Pixel]) ->
         obtProfundidadPixrgb(Pixel, D), obtCoordPixrgb(Pixel, X,Y), obtColorPixrgb(Pixel, R,G,B),
-        rgbHex(R, HexR),
-        rgbHex(G, HexG),
-        rgbHex(B, HexB), pixrgb_comprimido(X,Y,HexR,HexG,HexB,D,Pixel2);
-    false.
+        rgbHex(R, HexR), rgbHex(G, HexG), rgbHex(B, HexB), pixrgb_comprimido(X,Y,HexR,HexG,HexB,D,Pixel2).
 
 % Descripción: Predicado que comprime pixeles
 % Dominio: list X color X variable (list)
@@ -568,6 +530,20 @@ comprimirPixeles([Cabeza | Cola], Color, [NuevaCabeza | Cola2]):-
        NuevaCabeza = Cabeza,
        comprimirPixeles(Cola, Color, Cola2).
 
+
+% Descripción: Predicado que obtiene el pixel más repetido
+% Dominio: list x variable (Pixel)
+% Recorrido: Pixel
+% Tipo: Otras funciones
+% Tipo de recursión: Cola, entrega resultado inmediato
+pixelMasRepetido([], _, E, Elemento):- Elemento = E.
+pixelMasRepetido([Cabeza | Cola], Cant, Elem, Elemento):-
+    [Cantidad , _] = Cabeza,
+    (Cantidad > Cant) ->
+        [Cantidad, E] = Cabeza,
+        pixelMasRepetido(Cola, Cantidad, E, Elemento);
+        pixelMasRepetido(Cola, Cant, Elem, Elemento).
+
 % Descripción: Predicado que comprime una image por el color más
 % repetido
 % Dominio: image X variable (image)
@@ -575,12 +551,14 @@ comprimirPixeles([Cabeza | Cola], Color, [NuevaCabeza | Cola2]):-
 % Tipo: Modificador
 imageCompress(Imagen, Imagen2):-
     esImage(Imagen),
-    image(X,Y,Pixeles, Imagen),
+    obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
     imageToHistogram(Imagen, H),
     pixelMasRepetido(H, -1, _, PixelMasRepetido),
     comprimirPixeles(Pixeles, PixelMasRepetido, PixelesC),
     sort(PixelesC, Pixeles2),
-    image(X,Y,Pixeles2, Imagen2).
+    image(Ancho,Largo,Pixeles2, Imagen2).
+
+
 
 % Descripción: Predicado que verifica si dos pixeles tienen la misma
 % coordenada (x,y)
@@ -588,17 +566,9 @@ imageCompress(Imagen, Imagen2):-
 % Recorrido: Boleano
 % Tipo: Otras funciones
 igualCoordXY(Pixel, Pixel2):-
-    esPixmap([Pixel , Pixel2]) ->
-        obtCoordPixrgb(Pixel, X,Y), obtCoordPixrgb(Pixel2, X,Y) -> true; false
-    ;
-    esBitmap([Pixel , Pixel2]) ->
-        obtCoordPixbit(Pixel, X,Y), obtCoordPixbit(Pixel2, X,Y) -> true; false
-    ;
-    esHexmap([Pixel , Pixel2]) ->
-        obtCoordPixhex(Pixel, X,Y), obtCoordPixhex(Pixel2, X,Y) -> true; false
-    ;
-    false.
-
+    esPixmap([Pixel , Pixel2]) -> obtCoordPixrgb(Pixel, X,Y), obtCoordPixrgb(Pixel2, X,Y) -> true; false;
+    esBitmap([Pixel , Pixel2]) -> obtCoordPixbit(Pixel, X,Y), obtCoordPixbit(Pixel2, X,Y) -> true; false;
+    esHexmap([Pixel , Pixel2]) -> obtCoordPixhex(Pixel, X,Y), obtCoordPixhex(Pixel2, X,Y) -> true; false; false.
 
 % Descripción: Predicado que reemplaza un pixel de pixeles
 % Dominio: list X Pixel X variable (list)
@@ -615,7 +585,6 @@ changePixel([Cabeza | Cola], Pixel, [NuevaCabeza | Cola2]):-
             append(Cabeza, [], NuevaCabeza),
             changePixel(Cola, Pixel, Cola2).
 
-
 % Descripción: Predicado que reemplaza un pixel de la imagen
 % Dominio: image X Pixel X variable (image)
 % Recorrido: image
@@ -623,29 +592,15 @@ changePixel([Cabeza | Cola], Pixel, [NuevaCabeza | Cola2]):-
 imageChangePixel(Imagen, Pixel, Imagen2):-
     imageIsCompress(Imagen) ->
        imageDecompress(Imagen, ImagenD),
-       image(CoordX, CoordY, Pixeles, ImagenD),
+       obtCoordImage(ImagenD, Ancho, Largo), obtPixelesImage(ImagenD, Pixeles),
        changePixel(Pixeles, Pixel, Pixeles2),
-       image(CoordX, CoordY, Pixeles2, Imagen2)
+       image(Ancho, Largo, Pixeles2, Imagen2)
        ;
        esImage(Imagen),
-       image(CoordX, CoordY, Pixeles, Imagen),
+       obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
        changePixel(Pixeles, Pixel, Pixeles2),
-       image(CoordX, CoordY, Pixeles2, Imagen2).
+       image(Ancho, Largo, Pixeles2, Imagen2).
 
-% Descripción: Predicado que obtiene el color de un pixel
-% Dominio: Pixel X variable (string | int | list)
-% Recorrido: string | int | list
-% Tipo: Otras funciones
-colorPixel(Pixel, Color):-
-    esBitmap([Pixel]) -> obtColorPixbit(Pixel, Color);
-    esHexmap([Pixel]) -> obtColorPixhex(Pixel, Color);
-    esPixmap([Pixel]) -> obtColorPixrgb(Pixel, R,G,B), Color = [R,G,B].
-
-colorProfundidadPixrgb(Pixel, String):-
-    obtProfundidadPixrgb(Pixel, D), obtColorPixrgb(Pixel, R,G,B),
-    string_concat("[", R, S), string_concat(S, " ", S2), string_concat(S2, G, S3),
-    string_concat(S3, " ", S4), string_concat(S4, B, S5), string_concat(S5, " ", S6),
-    string_concat(S6, D, S7), string_concat(S7, "]", String).
 
 % Descripción: Predicado que crea la cadena de pixeles
 % Dominio: list X list X int X int X int X variable (list)
@@ -672,7 +627,6 @@ imageString_formato([CabezaC| ColaC], [Cabeza| Cola], CoordY, CoordX, CoordY_fin
               imageString_formato([CabezaC | ColaC], [Cabeza | Cola], 0, R3, CoordY_final, Cola2).
 
 
-
 % Descripción: Predicado que crea una cadena de string de la imagen
 % Dominio: image X variable (string)
 % Recorrido: string
@@ -680,46 +634,16 @@ imageString_formato([CabezaC| ColaC], [Cabeza| Cola], CoordY, CoordX, CoordY_fin
 imageToString(Imagen, Cadena):-
     imageIsCompress(Imagen) ->
        imageDecompress(Imagen, ImagenD),
-       image(_,CoordY,Pixeles, ImagenD),
-       CoordY_final is CoordY-1,
+       obtCoordImage(ImagenD, _, Largo), obtPixelesImage(ImagenD, Pixeles),
+       CoordY_final is Largo-1,
        imageString_formato(Pixeles, Pixeles, 0, 0, CoordY_final, String),
        atomics_to_string(String, Cadena)
        ;
-       esImage(Imagen), image(_,CoordY,Pixeles, Imagen),
-       CoordY_final is CoordY-1,
+       esImage(Imagen),
+       obtCoordImage(Imagen, _, Largo), obtPixelesImage(Imagen, Pixeles),
+       CoordY_final is Largo-1,
        imageString_formato(Pixeles, Pixeles, 0, 0, CoordY_final, String),
        atomics_to_string(String, Cadena).
-
-% Descripción: Predicado que verifica si dos pixel tiene igual
-% profundidad
-% Dominio: Pixel X Pixel
-% Recorrido: Boleano
-% Tipo: Otras funciones
-igualProfundidad(Pixel, Pixel2):-
-    esBitmap([Pixel]) ->
-        obtProfundidadPixbit(Pixel, D), obtProfundidadPixbit(Pixel2, D) ->  true; false;
-    esPixmap([Pixel]) ->
-        obtProfundidadPixrgb(Pixel, D), obtProfundidadPixrgb(Pixel2, D) -> true; false;
-    esHexmap([Pixel]) ->
-        obtProfundidadPixhex(Pixel, D), obtProfundidadPixhex(Pixel2, D) ->  true; false.
-
-% Descripción: Predicado que eliminar una profundidad de pixeles
-% Dominio: list X Pixel X variable (list)
-% Recorrido: list
-% Tipo: Otras funciones
-% Tipo de recursión: Natural, crea la lista con base a estados
-% pendientes
-eliminarProfundidad([Cola], Pixel, Cola2):-
-    igualProfundidad(Cola, Pixel) ->
-        Cola2 = [];
-        Cola2 = [Cola].
-
-eliminarProfundidad([Cabeza | Cola], Pixel, [NuevaCabeza | Cola2]):-
-    igualProfundidad(Cabeza, Pixel) ->
-        eliminarProfundidad(Cola, Pixel, [NuevaCabeza | Cola2]);
-        NuevaCabeza = Cabeza,
-        eliminarProfundidad(Cola, Pixel, Cola2).
-
 
 % Descripción: Predicado que obtiene la profundidad de un Pixel
 % Dominio: Pixel X variable (int)
@@ -730,6 +654,13 @@ obtenerProfundidad(Pixel, D):-
     esHexmap([Pixel]) ->  obtProfundidadPixhex(Pixel, D);
     esBitmap([Pixel]) ->  obtProfundidadPixbit(Pixel, D).
 
+% Descripción:
+listaEliminarProfundidad([],[]).
+listaEliminarProfundidad([Cabeza | Cola], [NuevaCabeza | Cola2]):-
+    obtenerProfundidad(Cabeza, D),
+    NuevaCabeza = [D, Cabeza],
+    listaEliminarProfundidad(Cola, Cola2).
+
 % Descripción: Predicado que crea una lista con profundidades
 % Dominio: list X variable (list)
 % Recorrido: list
@@ -739,7 +670,8 @@ obtenerProfundidad(Pixel, D):-
 listaProfundidad([],[]).
 listaProfundidad([Cabeza | Cola], [NuevaCabeza | Cola2]):-
     obtenerProfundidad(Cabeza, NuevaCabeza),
-    eliminarProfundidad([Cabeza | Cola], Cabeza, NuevaLista),
+    listaEliminarProfundidad([Cabeza | Cola], ListaAEliminar),
+    eliminarElemento(NuevaCabeza, ListaAEliminar, NuevaLista),
     listaProfundidad(NuevaLista, Cola2).
 
 % Descripción: Predicado que modifica el color de un Pixel a blanco
@@ -776,9 +708,9 @@ pixelesIgualProfundidad(Profundidad, [Cabeza | Cola], [NuevaCabeza | Cola2]):-
 % pendientes
 profundidad_formato(_,[],[]).
 profundidad_formato(Imagen, [Profundidad | ColaD], [NuevaCabeza | Cola2]):-
-    image(CoordX, CoordY, Pixeles, Imagen),
+    obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
     pixelesIgualProfundidad(Profundidad, Pixeles, PixelesD),
-    image(CoordX, CoordY, PixelesD, NuevaCabeza),
+    image(Ancho, Largo, PixelesD, NuevaCabeza),
     profundidad_formato(Imagen, ColaD, Cola2).
 
 % Descripción: Predicado que permite separar una imágen en capas en base a la profundidad en que se sitúan los pixeles
@@ -788,14 +720,13 @@ profundidad_formato(Imagen, [Profundidad | ColaD], [NuevaCabeza | Cola2]):-
 imageDepthLayers(Imagen, Lista):-
     imageIsCompress(Imagen) ->
        imageDecompress(Imagen, ImagenD),
-       image(_,_,Pixeles, ImagenD),
+       obtPixelesImage(ImagenD, Pixeles),
        listaProfundidad(Pixeles, Profundidades),
        profundidad_formato(ImagenD, Profundidades, Lista);
     esImage(Imagen),
-       image(_,_,Pixeles, Imagen),
+       obtPixelesImage(Imagen, Pixeles),
        listaProfundidad(Pixeles, Profundidades),
        profundidad_formato(Imagen,Profundidades, Lista).
-
 
 % Descripción: Predicado que descomprime un pixel comprimido
 % Dominio: Pixel_comprimido X variable (Pixel)
@@ -813,6 +744,18 @@ pixelDescomprimido(Pixel, Pixel2):-
         pixbit_comprimido(X,Y,B_list,D, Pixel),
         [_, B] = B_list, pixbit(X,Y,B,D, Pixel2).
 
+% Descripción: Predicado que verifica si es un pixrgb, pixhex o pixbit
+% Dominio: Pixel
+% Recorrido: Boleano
+% Tipo: Otras funciones
+esPixel(Elemento):-
+    esBitmapComprimido([Elemento]) -> false;
+    esPixmapComprimido([Elemento]) -> false;
+    esHexmapComprimido([Elemento]) -> false;
+    esBitmap([Elemento]) -> true;
+    esPixmap([Elemento]) -> true;
+    esHexmap([Elemento]) -> true; false.
+
 % Descripción: Predicado que descomprime pixeles de formato de pixeles
 % comprimidos
 % Dominio: list X variable (list)
@@ -826,7 +769,8 @@ pixelesDescomprimidos([Cabeza | Cola], [NuevaCabeza | Cola2]):-
         NuevaCabeza = Cabeza,
         pixelesDescomprimidos(Cola, Cola2)
         ;
-        pixelDescomprimido(Cabeza, NuevaCabeza), pixelesDescomprimidos(Cola,Cola2).
+        pixelDescomprimido(Cabeza, NuevaCabeza),
+        pixelesDescomprimidos(Cola,Cola2).
 
 % Descripción: Predicado que descomprime una imagen comprimida
 % Dominio: image X variable (image)
@@ -834,6 +778,6 @@ pixelesDescomprimidos([Cabeza | Cola], [NuevaCabeza | Cola2]):-
 % Tipo: Modificador
 imageDecompress(Imagen, Imagen2):-
     imageIsCompress(Imagen),
-    image(CoordX, CoordY, Pixeles, Imagen),
+    obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
     pixelesDescomprimidos(Pixeles, Pixeles2),
-    image(CoordX, CoordY, Pixeles2, Imagen2).
+    image(Ancho, Largo, Pixeles2, Imagen2).

@@ -88,9 +88,9 @@ obtProfundidadPixrgb(Pixrgb , Profundidad):-
 % Dominio: pixrgb X variable (String)
 % Recorrido: String
 % Tipo: Selector
-colorProfundidadPixrgb(Pixrgb, String):-
-    esPixmap([Pixrgb]),
-    obtProfundidadPixrgb(Pixrgb, D), obtColorPixrgb(Pixrgb, R,G,B),
+colorProfundidadPixrgb(Pixel, String):-
+    esPixmap([Pixel]),
+    obtProfundidadPixrgb(Pixel, D), obtColorPixrgb(Pixel, R,G,B),
     string_concat("[", R, S), string_concat(S, " ", S2), string_concat(S2, G, S3),
     string_concat(S3, " ", S4), string_concat(S4, B, S5), string_concat(S5, " ", S6),
     string_concat(S6, D, S7), string_concat(S7, "]", String).
