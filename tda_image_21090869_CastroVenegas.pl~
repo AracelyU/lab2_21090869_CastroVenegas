@@ -1,4 +1,20 @@
-:- module(tda_image_21090869_castrovenegas, [image/4]).
+:- module(tda_image_21090869_castrovenegas,[image/4,
+                                            imageIsBitmap/1,
+                                            imageIsHexmap/1,
+                                            imageIsPixmap/1,
+                                            imageIsCompress/1,
+                                            imageFlipH/2,
+                                            imageFlipV/2,
+                                            imageCrop/6,
+                                            imageRGBToHex/2,
+                                            imageInvertColorRGB/2,
+                                            imageToHistogram/2,
+                                            imageRotate90/2,
+                                            imageCompress/2,
+                                            imageChangePixel/3,
+                                            imageToString/2,
+                                            imageDepthLayers/2,
+                                            imageDecompress/2]).
 
 
 :- use_module(tda_pixbit_21090869_CastroVenegas).
@@ -75,27 +91,6 @@ obtPixelesImage(Imagen , Pixeles):-
 obtCoordImage(Imagen , CoordX, CoordY):-
     image(CoordX,CoordY, _, Imagen).
 
-% Descripción: Predicado que verifica existencia de (x,y) en Pixel
-% cuando se cambie el formato de pixeles en la imagen
-% Dominio: Pixel, int, int Recorrido: Boleano Tipo: Pertenencia,
-% apoya a predicado existeCoordXY
-% Tipo: Otras funciones
-existeCoord(Cabeza, X, Y):-
-    esBitmap([Cabeza]) -> obtCoordPixbit(Cabeza, CoordX, CoordY), CoordX = X, CoordY = Y  -> true; false
-    ;
-    esHexmap([Cabeza]) -> obtCoordPixhex(Cabeza, CoordX, CoordY), CoordX = X, CoordY = Y -> true; false
-    ;
-    esPixmap([Cabeza]) -> obtCoordPixrgb(Cabeza, CoordX, CoordY), CoordX = X, CoordY = Y -> true; false.
-
-% Descripción: Predicado que verifica si existe una coordenada (X,Y) en
-% especifica en la lista de pixeles de una imagen, para hacer flipH,
-% flipV entre otros en una imagen crop
-% Dominio: Pixel x int x int
-% Recorrido: Boleano Tipo: Pertenencia
-% Tipo: Otras funciones
-% Tipo de recursión: Cola, da resultado inmediato
-existeCoordXY([Cabeza | Cola], X, Y):- existeCoord(Cabeza, X, Y) -> true; existeCoordXY(Cola, X, Y).
-
 % Descripción: Predicado que verifica si el Pixel esta dentro del rango
 % dado por crop
 % Dominio: Pixel X int X int X int X int
@@ -114,7 +109,7 @@ rangoXY(Pixel, X1,X2,Y1,Y2):-
 % Dominio: Pixel X int X int X variable
 % (Pixel) Recorrido: Pixel
 % Tipo: Otras funciones
-cambiarCoordXY(Pixel,X, Y, P):-
+cambiarCoordXY(Pixel, X, Y, P):-
     integer(Y), Y >= 0, integer(X), X >= 0,
     esBitmap([Pixel]) -> obtProfundidadPixbit(Pixel, D), obtColorPixbit(Pixel, B), pixbit(X,Y,B,D, P);
     esHexmap([Pixel]) -> obtProfundidadPixhex(Pixel, D), obtColorPixhex(Pixel, H), pixhex(X,Y,H,D, P);
@@ -138,20 +133,16 @@ removerElemento(X, [Y|Xs], [Y|Zs]):-
 % Recorrido: list Tipo: Otras funciones
 % Tipo de recursión: Natural, pues crea una lista con base a estados
 % pendientes
-flipH_formato(_, [], _, _, _, []).
-flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, Contador, [NuevaCabeza | Cola2]):-
-    existeCoordXY([CabezaC | ColaC], CoordX, Contador) ->
-               R is CoordY_final-Contador,
-               R1 is Contador+1,
-               cambiarCoordXY(Cabeza, CoordX, R, NuevaCabeza),
-               flipH_formato([CabezaC | ColaC], Cola, CoordY_final, CoordX, R1, Cola2)
-               ;
-               (Contador > CoordY_final) ->
-                    R2 is CoordX+1,
-                    flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, R2, 0, Cola2)
-                    ;
-                    R3 is Contador+1,
-                    flipH_formato([CabezaC | ColaC], [Cabeza | Cola], CoordY_final, CoordX, R3, Cola2).
+flipH_formato([], _, _, _, []).
+flipH_formato([Cabeza | Cola], CoordY_final, CoordX, Contador, [NuevaCabeza | Cola2]):-
+    (Contador =< CoordY_final) ->
+           R is CoordY_final-Contador,
+           R1 is Contador+1,
+           cambiarCoordXY(Cabeza, CoordX, R, NuevaCabeza),
+           flipH_formato(Cola, CoordY_final, CoordX, R1, Cola2)
+           ;
+           R2 is CoordX+1,
+           flipH_formato([Cabeza | Cola], CoordY_final, R2, 0, [NuevaCabeza | Cola2]).
 
 
 % Descripción: Predicado que voltea la imagen horizontalmente
@@ -162,17 +153,15 @@ imageFlipH(Imagen, Imagen2):-
         imageDecompress(Imagen, ImagenD),
         image(CoordX, CoordY, Pixeles, ImagenD),
         CoordY_final is CoordY-1,
-        flipH_formato(Pixeles, Pixeles, CoordY_final, 0, 0, PixelesH),
-        sort(PixelesH, PixelesH2),
-        removerElemento([], PixelesH2, Pixeles2),
+        flipH_formato(Pixeles, CoordY_final, 0, 0, PixelesH),
+        sort(PixelesH, Pixeles2),
         image(CoordX, CoordY, Pixeles2, Imagen2)
         ;
         esImage(Imagen),
         image(CoordX, CoordY, Pixeles, Imagen),
         CoordY_final is CoordY-1,
-        flipH_formato(Pixeles, Pixeles, CoordY_final, 0, 0, PixelesH),
-        sort(PixelesH, PixelesH2),
-        removerElemento([], PixelesH2, Pixeles2),
+        flipH_formato(Pixeles, CoordY_final, 0, 0, PixelesH),
+        sort(PixelesH, Pixeles2),
         image(CoordX, CoordY, Pixeles2, Imagen2).
 
 
@@ -183,20 +172,17 @@ imageFlipH(Imagen, Imagen2):-
 % Tipo: Otras funciones
 % Tipo de recursión: Natural, pues crea una lista con base a estados
 % pendientes
-flipV_formato(_ ,[], _, _, _,_,[]).
-flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, CoordX, CoordY, CoordY_final, [NuevaCabeza | Cola2]):-
-    existeCoordXY([CabezaC | ColaC], CoordX, CoordY) ->
+flipV_formato([], _, _, _,_,[]).
+flipV_formato([Cabeza | Cola], CoordX_final, CoordX, CoordY, CoordY_final, [NuevaCabeza | Cola2]):-
+     (CoordY =< CoordY_final) ->
         R is CoordX_final-CoordX,
         R1 is CoordY+1,
-        cambiarCoordXY(Cabeza, CoordY, R, NuevaCabeza),
-        flipV_formato([CabezaC | ColaC], Cola, CoordX_final, CoordX, R1, CoordY_final, Cola2)
+        cambiarCoordXY(Cabeza, R, CoordY, NuevaCabeza),
+        flipV_formato(Cola, CoordX_final, CoordX, R1, CoordY_final, Cola2)
         ;
-        (CoordY > CoordY_final) ->
-            R2 is CoordX+1,
-            flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, R2, 0, CoordY_final, Cola2)
-            ;
-            R3 is CoordY+1,
-            flipV_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX_final, CoordX, R3, CoordY_final, Cola2).
+        R2 is CoordX+1,
+        flipV_formato([Cabeza | Cola], CoordX_final, R2, 0, CoordY_final, [NuevaCabeza | Cola2]).
+
 
 % Descripción: Predicado que voltea la imagen verticalmente
 % Dominio: image X variable (image)
@@ -207,18 +193,16 @@ imageFlipV(Imagen, Imagen2):-
         imageDecompress(Imagen, ImagenD),
         image(CoordX, CoordY, Pixeles, ImagenD),
         CoordX_final is CoordX-1, CoordY_final is CoordY-1,
-        flipV_formato(Pixeles, Pixeles, CoordX_final, 0, 0, CoordY_final, PixelesV),
-        sort(PixelesV, PixelesV2),
-        removerElemento([], PixelesV2, Pixeles2),
+        flipV_formato(Pixeles, CoordX_final, 0, 0, CoordY_final, PixelesV),
+        sort(PixelesV, Pixeles2),
         image(CoordX, CoordY, Pixeles2, Imagen2)
         ;
         esImage(Imagen),
         image(CoordX, CoordY, Pixeles, Imagen),
         CoordX_final is CoordX-1,
         CoordY_final is CoordY-1,
-        flipV_formato(Pixeles, Pixeles, CoordX_final, 0, 0, CoordY_final, PixelesV),
-        sort(PixelesV, PixelesV2),
-        removerElemento([], PixelesV2, Pixeles2),
+        flipV_formato(Pixeles, CoordX_final, 0, 0, CoordY_final, PixelesV),
+        sort(PixelesV, Pixeles2),
         image(CoordX, CoordY, Pixeles2, Imagen2).
 
 
@@ -229,14 +213,26 @@ imageFlipV(Imagen, Imagen2):-
 % Tipo: Otras funciones
 % Tipo de recursión: Natural, pues crea una lista con base a estados
 % pendientes
-crop_formato([], _,_, _, _, []).
-crop_formato([Cabeza | Cola], X1, X2, Y1, Y2, [Cabeza2 | Cola2]):-
+crop_filtro([], _,_, _, _, []).
+crop_filtro([Cabeza | Cola], X1, X2, Y1, Y2, [Cabeza2 | Cola2]):-
      rangoXY(Cabeza, X1, X2, Y1, Y2) ->
-            append(Cabeza, [], Cabeza2),
-            crop_formato(Cola, X1, X2, Y1, Y2, Cola2)
+            %append(Cabeza, [], Cabeza2),
+            Cabeza2 = Cabeza, write(Cabeza),
+            crop_filtro(Cola, X1, X2, Y1, Y2, Cola2)
             ;
-            crop_formato(Cola, X1, X2, Y1, Y2, Cola2).
+            crop_filtro(Cola, X1, X2, Y1, Y2, [Cabeza2 | Cola2]).
 
+crop_formato([], _,_,_,[]).
+crop_formato([Cabeza | Cola], CoordX, CoordY, CoordY_final, [NuevaCabeza | Cola2]):-
+    (CoordY =< CoordY_final) ->
+        write("\nentro"),
+        R is CoordY+1,
+        cambiarCoordXY(Cabeza, CoordX, CoordY, NuevaCabeza),
+        write(NuevaCabeza),
+        crop_formato(Cola, CoordX, R, CoordY_final, Cola2);
+
+        R2 is CoordX+1,
+        crop_formato([Cabeza | Cola], R2, 0, CoordY_final, Cola2).
 
 % Descripción: Predicado que devuelve el mayor entre dos números, apoya
 % a imageCrop
@@ -256,21 +252,32 @@ menor(A,B,C):- A =< B -> C is A ; C is B.
 % Dominio: image X int X int X int X int X variable (image)
 % Recorrido: image
 % Tipo: Modificador
-imageCrop(Imagen, X1,X2,Y1,Y2,Imagen2):-
+imageCrop(Imagen, X1,Y1,X2,Y2,Imagen2):-
    imageIsCompress(Imagen) ->
        imageDecompress(Imagen, ImagenD),
-       image(CoordX, CoordY, Pixeles, ImagenD),
-       menor(X1,X2,X_menor), mayor(X1,X2,X_mayor),
-       menor(Y1,Y2,Y_menor), mayor(Y1,Y2,Y_mayor),
-       crop_formato(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC),
-       removerElemento([], PixelesC, Pixeles2), image(CoordX, CoordY, Pixeles2, Imagen2)
+       image(_, _, Pixeles, ImagenD),
+       menor(X1,X2,X_menor), mayor(X1,X2,X_mayor), menor(Y1,Y2,Y_menor), mayor(Y1,Y2,Y_mayor),
+       crop_filtro(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC),
+       removerElemento([], PixelesC, PixelesC2),
+       CoordY_final is Y_mayor - Y_menor,
+       crop_formato(PixelesC2, 0,0, CoordY_final, PixelesC3),
+       removerElemento([], PixelesC3, Pixeles2),
+       CoordX is X_mayor - X_menor,
+       CoordXNuevo is CoordX + 1,
+       CoordYNuevo is CoordY_final +1,
+       image(CoordXNuevo, CoordYNuevo, Pixeles2, Imagen2)
        ;
        esImage(Imagen),
-       image(CoordX, CoordY, Pixeles, Imagen),
-       menor(X1,X2,X_menor), mayor(X1,X2,X_mayor),
-       menor(Y1,Y2,Y_menor), mayor(Y1,Y2,Y_mayor),
-       crop_formato(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC),
-       removerElemento([], PixelesC, Pixeles2), image(CoordX, CoordY, Pixeles2, Imagen2).
+       image(_, _, Pixeles, Imagen),
+       menor(X1,X2,X_menor), mayor(X1,X2,X_mayor), menor(Y1,Y2,Y_menor), mayor(Y1,Y2,Y_mayor),
+       crop_filtro(Pixeles, X_menor, X_mayor, Y_menor, Y_mayor, PixelesC), removerElemento([], PixelesC, PixelesC2),
+       CoordY_final is Y_mayor - Y_menor,
+       crop_formato(PixelesC2, 0,0, CoordY_final, PixelesC3),
+       removerElemento([], PixelesC3, Pixeles2),
+       CoordX is X_mayor - X_menor,
+       CoordXNuevo is CoordX + 1,
+       CoordYNuevo is CoordY_final +1,
+       image(CoordXNuevo, CoordYNuevo, Pixeles2, Imagen2).
 
 % Descripción: Predicado que entrega el equivalente a entero de un
 % string, apoya en imageCompress
@@ -418,7 +425,7 @@ igualColor(Pixel, Pixel2):-
 % Tipo de recursión: Natural, pues crea una nueva lista con base a
 % estados pendientes
 % Tipo: Otras funciones
-eliminarColor([], _, []).
+eliminarColor([], _, []):- !.
 eliminarColor([Cabeza | Cola], Pixel, [NuevaCabeza | Cola2]):-
     igualColor(Cabeza, Pixel) ->
         eliminarColor(Cola, Pixel, Cola2);
@@ -456,13 +463,13 @@ contarColor([Cabeza | Cola], Pixel, C):-
 % Tipo: Otras funciones
 % Tipo de recursión: Natural, pues crea la lista con base a estados
 % pendientes
-histograma_formato([], _).
+histograma_formato([], []).
 histograma_formato([Cabeza | Cola], [[Cantidad , Elemento] | Cola2]):-
-        colorPixel(Cabeza, Elemento),
-        contarColor([Cabeza | Cola], Cabeza, Cantidad),
-        eliminarColor([Cabeza | Cola], Cabeza, NuevaLista),
-        removerElemento([], NuevaLista, NuevaLista2),
-        histograma_formato(NuevaLista2, Cola2).
+        colorPixel(Cabeza, Elemento), write("\nColor="), write(Elemento),
+        contarColor([Cabeza | Cola], Cabeza, Cantidad), write("\nContador="), write(Cantidad),
+        eliminarColor([Cabeza | Cola], Cabeza, NuevaLista2), write("\nNuevaLista="), write(NuevaLista),
+        removerElemento([], NuevaLista2, NuevaLista),
+        histograma_formato(NuevaLista, Cola2).
 
 % Descripción: Predicado que obtiene el histograma de una imagen
 % Dominio: image X variable (image)
@@ -484,20 +491,16 @@ imageToHistogram(Imagen, Histograma):-
 % Tipo: Otras funciones
 % Tipo de recursión: Natural, crea la lista con base a estados
 % pendientes
-rotate90_formato(_,[],_,_,_,_,_).
-rotate90_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX, Contador, CoordX_final, CoordY_final, [NuevaCabeza | Cola2]):-
-    existeCoordXY([CabezaC | ColaC], CoordX, Contador) ->
+rotate90_formato([],_,_,_,_,[]).
+rotate90_formato([Cabeza | Cola], CoordX, Contador, CoordX_final, CoordY_final, [NuevaCabeza | Cola2]):-
+    (Contador =< CoordY_final) ->
         R1 is Contador+1,
         cambiarCoordXY(Cabeza, Contador, CoordX_final, NuevaCabeza),
-        rotate90_formato([CabezaC | ColaC], Cola, CoordX, R1, CoordX_final, CoordY_final, Cola2)
+        rotate90_formato(Cola, CoordX, R1, CoordX_final, CoordY_final, Cola2)
         ;
-        (Contador > CoordY_final) ->
-            R3 is CoordX+1,
-            R4 is CoordX_final-1,
-            rotate90_formato([CabezaC | ColaC], [Cabeza | Cola], R3, 0, R4, CoordY_final, Cola2)
-            ;
-            R3 is Contador+1,
-            rotate90_formato([CabezaC | ColaC], [Cabeza | Cola], CoordX, R3, CoordX_final, CoordY_final, Cola2).
+        R3 is CoordX+1,
+        R4 is CoordX_final-1,
+        rotate90_formato([Cabeza | Cola], R3, 0, R4, CoordY_final, [NuevaCabeza | Cola2]).
 
 % Descripción: Predicado que rota una imagen 90° a la derecha
 % Dominio: image X variable (image)
@@ -508,15 +511,15 @@ imageRotate90(Imagen, Imagen2):-
        imageDecompress(Imagen, ImagenD),
        image(CoordX, CoordY, Pixeles, ImagenD),
        CoordX_final is CoordY-1, CoordY_final is CoordX-1,
-       rotate90_formato(Pixeles, Pixeles, 0,0, CoordX_final, CoordY_final, PixelesR),
-       removerElemento([], PixelesR, PixelesR2), sort(PixelesR2, Pixeles2),
+       rotate90_formato(Pixeles, 0,0, CoordX_final, CoordY_final, PixelesR),
+       sort(PixelesR, Pixeles2),
        image(CoordY, CoordX, Pixeles2, Imagen2)
        ;
        esImage(Imagen),
        image(CoordX, CoordY, Pixeles, Imagen),
        CoordX_final is CoordY-1, CoordY_final is CoordX-1,
-       rotate90_formato(Pixeles, Pixeles, 0,0, CoordX_final, CoordY_final, PixelesR),
-       removerElemento([], PixelesR, PixelesR2), sort(PixelesR2, Pixeles2),
+       rotate90_formato(Pixeles, 0,0, CoordX_final, CoordY_final, PixelesR),
+       sort(PixelesR, Pixeles2),
        image(CoordY, CoordX, Pixeles2, Imagen2).
 
 % Descripción: Predicado que obtiene el pixel más repetido
@@ -576,8 +579,7 @@ imageCompress(Imagen, Imagen2):-
     imageToHistogram(Imagen, H),
     pixelMasRepetido(H, -1, _, PixelMasRepetido),
     comprimirPixeles(Pixeles, PixelMasRepetido, PixelesC),
-    sort(PixelesC, PixelesC2),
-    removerElemento([], PixelesC2, Pixeles2),
+    sort(PixelesC, Pixeles2),
     image(X,Y,Pixeles2, Imagen2).
 
 % Descripción: Predicado que verifica si dos pixeles tienen la misma
@@ -639,6 +641,11 @@ colorPixel(Pixel, Color):-
     esHexmap([Pixel]) -> obtColorPixhex(Pixel, Color);
     esPixmap([Pixel]) -> obtColorPixrgb(Pixel, R,G,B), Color = [R,G,B].
 
+colorProfundidadPixrgb(Pixel, String):-
+    obtProfundidadPixrgb(Pixel, D), obtColorPixrgb(Pixel, R,G,B),
+    string_concat("[", R, S), string_concat(S, " ", S2), string_concat(S2, G, S3),
+    string_concat(S3, " ", S4), string_concat(S4, B, S5), string_concat(S5, " ", S6),
+    string_concat(S6, D, S7), string_concat(S7, "]", String).
 
 % Descripción: Predicado que crea la cadena de pixeles
 % Dominio: list X list X int X int X int X variable (list)
@@ -648,21 +655,22 @@ colorPixel(Pixel, Color):-
 % pendientes
 imageString_formato(_, [],_,_, _, ["\n"]).
 imageString_formato([CabezaC| ColaC], [Cabeza| Cola], CoordY, CoordX, CoordY_final, [String | Cola2]):-
-    existeCoordXY([CabezaC | ColaC], CoordX, CoordY) ->
+    (CoordY =< CoordY_final) ->
+              (esPixmap([Cabeza]) ->
+                  R is CoordY + 1,
+                  colorProfundidadPixrgb(Cabeza, StringMedio),
+                  string_concat(StringMedio, "\t", String),
+                  imageString_formato([CabezaC | ColaC], Cola, R, CoordX, CoordY_final, Cola2)
+                  ;
+                  R is CoordY + 1, colorPixel(Cabeza, Color),
+                  string_concat(Color, "\t", String),
+                  imageString_formato([CabezaC | ColaC], Cola, R, CoordX, CoordY_final, Cola2))
 
-              R is CoordY + 1,
-              colorPixel(Cabeza, Color),
-              string_concat(Color, "\t", String),
-              imageString_formato([CabezaC | ColaC], Cola, R, CoordX, CoordY_final, Cola2)
-        ;
-              CoordY > CoordY_final ->
-                       R3 is CoordX + 1,
-                       string_concat("\n", "", String),
-                       imageString_formato([CabezaC | ColaC], [Cabeza | Cola], 0, R3, CoordY_final, Cola2)
-                       ;
-                       R2 is CoordY + 1,
-                       string_concat("", "\t", String),
-                       imageString_formato([CabezaC | ColaC], [Cabeza | Cola], R2, CoordX, CoordY_final, Cola2).
+              ;
+              R3 is CoordX + 1,
+              string_concat("\n", "", String),
+              imageString_formato([CabezaC | ColaC], [Cabeza | Cola], 0, R3, CoordY_final, Cola2).
+
 
 
 % Descripción: Predicado que crea una cadena de string de la imagen
@@ -701,10 +709,14 @@ igualProfundidad(Pixel, Pixel2):-
 % Tipo: Otras funciones
 % Tipo de recursión: Natural, crea la lista con base a estados
 % pendientes
-eliminarProfundidad([], _, []).
+eliminarProfundidad([Cola], Pixel, Cola2):-
+    igualProfundidad(Cola, Pixel) ->
+        Cola2 = [];
+        Cola2 = [Cola].
+
 eliminarProfundidad([Cabeza | Cola], Pixel, [NuevaCabeza | Cola2]):-
     igualProfundidad(Cabeza, Pixel) ->
-        eliminarProfundidad(Cola, Pixel, Cola2);
+        eliminarProfundidad(Cola, Pixel, [NuevaCabeza | Cola2]);
         NuevaCabeza = Cabeza,
         eliminarProfundidad(Cola, Pixel, Cola2).
 
@@ -728,17 +740,16 @@ listaProfundidad([],[]).
 listaProfundidad([Cabeza | Cola], [NuevaCabeza | Cola2]):-
     obtenerProfundidad(Cabeza, NuevaCabeza),
     eliminarProfundidad([Cabeza | Cola], Cabeza, NuevaLista),
-    removerElemento([], NuevaLista, NuevaLista2),
-    listaProfundidad(NuevaLista2, Cola2).
+    listaProfundidad(NuevaLista, Cola2).
 
 % Descripción: Predicado que modifica el color de un Pixel a blanco
 % Dominio: Pixel X variable (Pixel)
 % Recorrido: Pixel
 % Tipo: Otras funciones
-reemplazarPixelProfundidad(Pixel, Pixel2):-
-    esBitmap([Pixel]) ->  obtProfundidadPixbit(Pixel, D), obtCoordPixbit(Pixel, X,Y), pixbit(X,Y,1,D, Pixel2);
-    esPixmap([Pixel]) ->  obtProfundidadPixrgb(Pixel, D), obtCoordPixrgb(Pixel, X,Y), pixrgb(X,Y,255,255,255,D, Pixel2);
-    esHexmap([Pixel]) ->  obtProfundidadPixhex(Pixel, D), obtCoordPixhex(Pixel, X,Y), pixhex(X,Y,"#FFFFFF",D, Pixel2).
+reemplazarPixelProfundidad(Pixel, Pixel2, D):-
+    esBitmap([Pixel]) ->  obtCoordPixbit(Pixel, X,Y), pixbit(X,Y,1,D, Pixel2);
+    esPixmap([Pixel]) ->  obtCoordPixrgb(Pixel, X,Y), pixrgb(X,Y,255,255,255,D, Pixel2);
+    esHexmap([Pixel]) ->  obtCoordPixhex(Pixel, X,Y), pixhex(X,Y,"#FFFFFF",D, Pixel2).
 
 % Descripción: Función que crea una lista de pixeles con misma
 % profundidad y los que no se rellenan con blanco
@@ -753,7 +764,7 @@ pixelesIgualProfundidad(Profundidad, [Cabeza | Cola], [NuevaCabeza | Cola2]):-
     (D = Profundidad) ->
         NuevaCabeza = Cabeza,
         pixelesIgualProfundidad(Profundidad, Cola, Cola2);
-        reemplazarPixelProfundidad(Cabeza, NuevaCabeza),
+        reemplazarPixelProfundidad(Cabeza, NuevaCabeza, Profundidad),
         pixelesIgualProfundidad(Profundidad, Cola, Cola2).
 
 % Descripción: Predicado que crea la lista de imagenes diferenciadas por
@@ -763,7 +774,7 @@ pixelesIgualProfundidad(Profundidad, [Cabeza | Cola], [NuevaCabeza | Cola2]):-
 % Tipo: Otras funciones
 % Tipo de recursión: Natural, crea la lista con base a estados
 % pendientes
-profundidad_formato(_,[],_).
+profundidad_formato(_,[],[]).
 profundidad_formato(Imagen, [Profundidad | ColaD], [NuevaCabeza | Cola2]):-
     image(CoordX, CoordY, Pixeles, Imagen),
     pixelesIgualProfundidad(Profundidad, Pixeles, PixelesD),
@@ -779,13 +790,12 @@ imageDepthLayers(Imagen, Lista):-
        imageDecompress(Imagen, ImagenD),
        image(_,_,Pixeles, ImagenD),
        listaProfundidad(Pixeles, Profundidades),
-       profundidad_formato(ImagenD, Profundidades, ListaP),
-       removerElemento([], ListaP, Lista);
+       profundidad_formato(ImagenD, Profundidades, Lista),
     esImage(Imagen),
        image(_,_,Pixeles, Imagen),
        listaProfundidad(Pixeles, Profundidades),
-       profundidad_formato(Imagen,Profundidades, ListaP),
-       removerElemento([], ListaP, Lista).
+       profundidad_formato(Imagen,Profundidades, Lista).
+
 
 % Descripción: Predicado que descomprime un pixel comprimido
 % Dominio: Pixel_comprimido X variable (Pixel)
