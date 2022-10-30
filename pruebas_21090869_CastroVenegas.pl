@@ -176,7 +176,7 @@ con al menos 3 ejemplos más por cada predicado.
 OBS:
 -> Las imagenes definidas tendrán el formato ImgX para diferenciarlas
 de las imagenes anteriores con formato IX
--> Los pixeles definidos tendrán el formato AX,BX,CX...ZX para
+-> Los pixeles definidos tendrán el formato A,B,C...Z para
 diferenciarlas de los pixeles anteriores con formato PX
 -> en total salieron XX imagenes definidas
 
@@ -189,9 +189,9 @@ pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
 image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageToString(Img1, Str),
 write(Str).
 
-pixhex(0,0,"#A0A0A0",10,A2), pixhex(0,1,"#FF30A0", 10, B2),
-pixhex(1,0,"#FFFF00", 25, C2), pixhex(1,1,"#FF30A0", 10, D2),
-image(2,2,[A2,B2,C2,D2], Img2), imageToString(Img2, Str),
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageToString(Img2, Str),
 write(Str).
 
 pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
@@ -208,9 +208,9 @@ image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageIsBitmap(Img1).
 
 Estos casos dan false
 
-pixhex(0,0,"#A0A0A0",10,A2), pixhex(0,1,"#FF30A0", 10, B2),
-pixhex(1,0,"#FFFF00", 25, C2), pixhex(1,1,"#FF30A0", 10, D2),
-image(2,2,[A2,B2,C2,D2], Img2), imageIsBitmap(Img2).
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageIsBitmap(Img2).
 
 pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
 pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
@@ -219,9 +219,9 @@ image(2,3,[A,B,C,D,E,F], Img3), imageIsBitmap(Img3).
 
 Probar el predicado imageIsHexmap
 
-pixhex(0,0,"#A0A0A0",10,A2), pixhex(0,1,"#FF30A0", 10, B2),
-pixhex(1,0,"#FFFF00", 25, C2), pixhex(1,1,"#FF30A0", 10, D2),
-image(2,2,[A2,B2,C2,D2], Img2), imageIsHexmap(Img2).
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageIsHexmap(Img2).
 
 Estos casos dan false
 
@@ -249,9 +249,9 @@ pixbit(1,0,1,40,D), pixbit(1,1,1,10,E), pixbit(1,2,0,10,F),
 pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
 image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageIsPixmap(Img1).
 
-pixhex(0,0,"#A0A0A0",10,A2), pixhex(0,1,"#FF30A0", 10, B2),
-pixhex(1,0,"#FFFF00", 25, C2), pixhex(1,1,"#FF30A0", 10, D2),
-image(2,2,[A2,B2,C2,D2], Img2), imageIsPixmap(Img2).
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageIsPixmap(Img2).
 
 Probar el predicado imageIsCompress
 
@@ -261,9 +261,9 @@ pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
 image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageCompress(Img1, Img1A),
 imageIsCompress(Img1A).
 
-pixhex(0,0,"#A0A0A0",10,A2), pixhex(0,1,"#FF30A0", 10, B2),
-pixhex(1,0,"#FFFF00", 25, C2), pixhex(1,1,"#FF30A0", 10, D2),
-image(2,2,[A2,B2,C2,D2], Img2), imageCompress(Img2, Img2A),
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageCompress(Img2, Img2A),
 imageIsCompress(Img2A).
 
 pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
@@ -280,16 +280,65 @@ pixbit(1,0,1,40,D), pixbit(1,1,1,10,E), pixbit(1,2,0,10,F),
 pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
 image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageIsCompress(Img1).
 
-pixhex(0,0,"#A0A0A0",10,A2), pixhex(0,1,"#FF30A0", 10, B2),
-pixhex(1,0,"#FFFF00", 25, C2), pixhex(1,1,"#FF30A0", 10, D2),
-image(2,2,[A2,B2,C2,D2], Img2), imageIsCompress(Img2).
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageIsCompress(Img2).
 
 pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
 pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
 pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
 image(2,3,[A,B,C,D,E,F], Img3), imageIsCompress(Img3).
 
+Probar predicado imageFlipH
 
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
+pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
+image(2,3,[A,B,C,D,E,F], Img3), imageFlipH(Img3, Img3A).
+
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
+pixbit(0,3,1,40,D), pixbit(0,4,1,10,E), pixbit(0,5,0,10,F),
+image(1,6, [A,B,C,D,E,F], Img4), imageFlipH(Img4, Img4A).
+
+pixhex(0,0,"#A0A0A0",10,A), pixhex(1,0,"#FF30A0", 10, B),
+pixhex(2,0,"#FFFF00",25,C), pixhex(3,0,"#FF30A0", 10, D),
+pixhex(4,0,"#000000",13,E), image(5, 1, [A,B,C,D,E], Img5),
+imageFlipH(Img5, Img5A).
+
+Probar el predicado imageFlipV
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
+pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
+image(2,3,[A,B,C,D,E,F], Img3), imageFlipV(Img3, Img3A).
+
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
+pixbit(0,3,1,40,D), pixbit(0,4,1,10,E), pixbit(0,5,0,10,F),
+image(1,6, [A,B,C,D,E,F], Img4), imageFlipV(Img4, Img4A).
+
+pixhex(0,0,"#A0A0A0",10,A), pixhex(1,0,"#FF30A0", 10, B),
+pixhex(2,0,"#FFFF00",25,C), pixhex(3,0,"#FF30A0", 10, D),
+pixhex(4,0,"#000000",13,E), image(5, 1, [A,B,C,D,E], Img5),
+imageFlipV(Img5, Img5A).
+
+Probar imageCrop
+
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageCrop(Img2, 0,0,0,1,Img6),
+image(1,2,[A,B], Img7).
+
+En el ejemplo anterior "Img6" = "Img7"
+
+
+%!   este aún no lo he confirmado
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(1,0,30,30,30,30,C), pixrgb(1,1,40,40,40,40,D),
+pixrgb(2,0,10,10,10,10,E), pixrgb(2,1,10,10,10,10,F),
+image(3,2,[A,B,C,D,E,F], Img3), imageCrop(Img3, 1,0,2,1, Img4),
+pixrgb(0,0,30,30,30,30,A2), pixrgb(0,1,40,40,40,40,B2),
+pixrgb(1,0,10,10,10,10,C2), pixrgb(1,1,10,10,10,10,D2),
+image(2,2,[A2,B2,C2,D2], Img5).
 
 
 */
