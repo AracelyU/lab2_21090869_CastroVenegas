@@ -22,7 +22,7 @@
 % Metas primarias:
 % pixbit_comprimido{CoordX, CoordY, BitL, Profundidad, [CoordX, CoordY,
 % BitL, Profundidad]}
-% esBitmapComprimido{[Pixel]}
+% esBitmapC{[Pixel]}
 % obtCoordPixbit{PixbitC , CoordX, CoordY}
 % obtColorPixbit{PixbitC , Bit}
 % obtProfundidadPixbit{PixbitC , Profundidad}

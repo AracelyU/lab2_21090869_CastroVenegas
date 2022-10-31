@@ -10,34 +10,45 @@
 % CoordX, CoordY, Profundidad: integer >= 0
 % HexR, HexG, HexB: string
 % PixrgbC: pixrgb_comprimido
+% Pixel = pixrgb | pixbit | pixhex
 %
 % Predicados:
-% pixrgb_comprimido (aridad = 7)
-% esPixmapComprimido (aridad = 1)
-% obtCoordPixrgbC (aridad = 3)
-% obtColorPixrgbC (aridad = 4)
-% obtProfundidadPixrgbC (aridad = 2)
+% pixrgb_comprimido{CoordX, CoordY, HexR, HexG, HexB, Profundidad,
+% [CoordX, CoordY, HexR, HexG, HexB, Profundidad]} (aridad = 7)
+% esPixmapComprimido{[Pixel]} (aridad = 1)
+% obtCoordPixrgbC{PixrgbC , CoordX, CoordY} (aridad = 3)
+% obtColorPixrgbC{PixrgbC , HexR, HexG, HexB}  (aridad = 4)
+% obtProfundidadPixrgbC{PixrgbC , Profundidad} (aridad = 2)
 %
-%?????????????????????????????????????
-% Metas primarias: pixrgb_comprimido, esPixmapComprimido,
-% obtCoordPixrgbC, obtColorPixrgbC, obtProfundidadPixrgbC
 %
-% Metas secundarias:
+% Metas primarias:
+% pixrgb_comprimido{CoordX, CoordY, HexR, HexG, HexB, Profundidad,
+% [CoordX, CoordY, HexR, HexG, HexB, Profundidad]}
+% esPixmapComprimido{[Pixel]}
+% obtCoordPixrgbC{PixrgbC , CoordX, Coord}
+% obtColorPixrgbC{PixrgbC , HexR, HexG, HexB}
+% obtProfundidadPixrgbC{PixrgbC , Profundidad}
+%
+% Metas secundarias: -
 %
 %
 % ----------------------REPRESENTACIÓN--------------------------------
 % El pixrgb_comprimido se representa como una lista con
-% (int X int X string X string X string X int) el cúal contiene CoordX,
+% (int X int X string X string X string X int) el cual contiene CoordX,
 % CoordY, HexR, HexG, HexB y Profundidad
 % --------------------------------------------------------------------
-
-%---------------------------CONSTRUCTOR-------------------------------
+%
+% Reglas
+% ----------CONSTRUCTOR Y MODIFICADOR-------------------------------
 
 % Descripción: Predicado que define como es un pixrgb_comprimido
 % Dominio: int X int X string X string X string X int X PixrgbC
-% Tipo: Constructor
+% Tipo: Contructor y modificador a la vez
 pixrgb_comprimido(CoordX, CoordY, HexR, HexG, HexB, Profundidad, [CoordX, CoordY, HexR, HexG, HexB, Profundidad]):-
-    integer(CoordX), CoordX >= 0, integer(CoordY), CoordY >= 0, string(HexR), string(HexG), string(HexB), integer(Profundidad), Profundidad >= 0.
+    integer(CoordX), CoordX >= 0,
+    integer(CoordY), CoordY >= 0,
+    string(HexR), string(HexG), string(HexB),
+    integer(Profundidad), Profundidad >= 0.
 
 
 %------------------------------PERTENENCIA----------------------------
