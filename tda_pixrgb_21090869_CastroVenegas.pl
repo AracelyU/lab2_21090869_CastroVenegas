@@ -5,23 +5,15 @@
 
 
 % DOMINIO
-% CoordX = número
-% CoordY = número
-% ColorR = 0 >= número >= 255
-% ColorG = 0 >= número >= 255
-% ColorB = 0 >= número >= 255
-% Profundidad = número
-% HexR = string
-% HexG = string
-% HexB = string
+% CoordX, CoordY, Profundidad = integer >= 0
+% ColorR = 0 >= integer >= 255
+% ColorG = 0 >= integer >= 255
+% ColorB = 0 >= integer >= 255
 % Pixel = pixrgb | pixbit | pixhex
 %
 % PREDICADOS
 % pixrgb = {CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad}
 % aridad = 6
-% pixrgb_comprimido = {CoordX, CoordY, HexR, HexG, HexB, Profundidad}
-% Profundidad} aridad = 6 esPixmap = {[Pixel]} aridad = 1
-% esPixmapComprimido = {[Pixel]} aridad 1
 %
 %
 % METAS
@@ -29,7 +21,7 @@
 % pixrgb = (CoordX, CoordY, ColorR, ColorG, ColorB, Profundidad)
 %
 % Secundaria
-% pixrgb_comprimido = (CoordX, CoordY, ColorR, ColorG, Profundidad)
+%
 %
 %
 % CLAUSURAS

@@ -210,10 +210,8 @@ crop_filtro([Cabeza | Cola], X1,X2,Y1,Y2, [NuevaCabeza | Cola2]):-
 crop_formato([], _,_,_,[]).
 crop_formato([Cabeza | Cola], CoordX, CoordY, CoordY_final, [NuevaCabeza | Cola2]):-
     (CoordY =< CoordY_final) ->
-        write("\nentro"),
         R is CoordY+1,
         cambiarCoordXY(Cabeza, CoordX, CoordY, NuevaCabeza),
-        write(NuevaCabeza),
         crop_formato(Cola, CoordX, R, CoordY_final, Cola2);
 
         R2 is CoordX+1,
@@ -243,11 +241,14 @@ imageCrop(Imagen, X1,Y1,X2,Y2,Imagen2):-
        eliminarElemento(0, PixelesC, PixelesC2),
        CoordY_final is Y_mayor - Y_menor,
        crop_formato(PixelesC2, 0,0, CoordY_final, Pixeles2),
-       CoordX is X_mayor - X_menor,
-       CoordXNuevo is CoordX + 1,
-       CoordYNuevo is CoordY_final + 1,
-       image(CoordXNuevo, CoordYNuevo, Pixeles2, Imagen2)
-       ;
+       length(Pixeles2, N),
+       (   (N \== 0) ->
+           CoordX is X_mayor - X_menor,
+           CoordXNuevo is CoordX + 1,
+           CoordYNuevo is CoordY_final + 1,
+           image(CoordXNuevo, CoordYNuevo, Pixeles2, Imagen2);
+           image(0,0,Pixeles2, Imagen2) )
+        ;
        esImage(Imagen),
        image(_, _, Pixeles, Imagen),
        menor(X1,X2,X_menor), mayor(X1,X2,X_mayor), menor(Y1,Y2,Y_menor), mayor(Y1,Y2,Y_mayor),
@@ -255,10 +256,14 @@ imageCrop(Imagen, X1,Y1,X2,Y2,Imagen2):-
        eliminarElemento(0, PixelesC, PixelesC2),
        CoordY_final is Y_mayor - Y_menor,
        crop_formato(PixelesC2, 0,0, CoordY_final, Pixeles2),
-       CoordX is X_mayor - X_menor,
-       CoordXNuevo is CoordX + 1,
-       CoordYNuevo is CoordY_final + 1,
-       image(CoordXNuevo, CoordYNuevo, Pixeles2, Imagen2).
+       length(Pixeles2, N),
+       (   (N \== 0) ->
+           CoordX is X_mayor - X_menor,
+           CoordXNuevo is CoordX + 1,
+           CoordYNuevo is CoordY_final + 1,
+           image(CoordXNuevo, CoordYNuevo, Pixeles2, Imagen2);
+           image(0,0, Pixeles2, Imagen2)).
+
 
 
 % Descripción: Predicado que entrega el equivalente a string de un
@@ -415,16 +420,15 @@ imageToHistogram(Imagen, Histograma):-
 % Tipo de recursión: Natural, crea la lista con base a estados
 % pendientes
 % Tipo: Otras funciones
-rotate90_formato([],_,_,_,_,[]).
-rotate90_formato([Cabeza | Cola], CoordX, Contador, CoordX_final, CoordY_final, [NuevaCabeza | Cola2]):-
+rotate90_formato([],_,_,_,[]).
+rotate90_formato([Cabeza | Cola], Contador, CoordX_final, CoordY_final, [NuevaCabeza | Cola2]):-
     (Contador =< CoordY_final) ->
         R1 is Contador+1,
         cambiarCoordXY(Cabeza, Contador, CoordX_final, NuevaCabeza),
-        rotate90_formato(Cola, CoordX, R1, CoordX_final, CoordY_final, Cola2)
+        rotate90_formato(Cola, R1, CoordX_final, CoordY_final, Cola2)
         ;
-        R3 is CoordX+1,
         R4 is CoordX_final-1,
-        rotate90_formato([Cabeza | Cola], R3, 0, R4, CoordY_final, [NuevaCabeza | Cola2]).
+        rotate90_formato([Cabeza | Cola], 0, R4, CoordY_final, [NuevaCabeza | Cola2]).
 
 % Descripción: Predicado que rota una imagen 90° a la derecha
 % Dominio: image X image
@@ -433,15 +437,15 @@ imageRotate90(Imagen, Imagen2):-
     imageIsCompress(Imagen) ->
        imageDecompress(Imagen, ImagenD),
        obtCoordImage(ImagenD, Ancho, Largo), obtPixelesImage(ImagenD, Pixeles),
-       CoordX_final is Largo-1, CoordY_final is Ancho-1,
-       rotate90_formato(Pixeles, 0,0, CoordX_final, CoordY_final, PixelesR),
+       CoordX_final is Ancho-1, CoordY_final is Largo-1,
+       rotate90_formato(Pixeles, 0, CoordX_final, CoordY_final, PixelesR),
        sort(PixelesR, Pixeles2),
        image(Largo, Ancho, Pixeles2, Imagen2)
        ;
        esImage(Imagen),
        obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
-       CoordX_final is Largo-1, CoordY_final is Ancho-1,
-       rotate90_formato(Pixeles, 0,0, CoordX_final, CoordY_final, PixelesR),
+       CoordX_final is Ancho-1, CoordY_final is Largo-1,
+       rotate90_formato(Pixeles, 0, CoordX_final, CoordY_final, PixelesR),
        sort(PixelesR, Pixeles2),
        image(Largo, Ancho, Pixeles2, Imagen2).
 

@@ -178,7 +178,6 @@ OBS:
 de las imagenes anteriores con formato IX
 -> Los pixeles definidos tendrán el formato A,B,C...Z para
 diferenciarlas de los pixeles anteriores con formato PX
--> en total salieron XX imagenes definidas
 
 
 Probar el predicado image
@@ -272,7 +271,6 @@ pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
 image(2,3,[A,B,C,D,E,F], Img3),
 imageCompress(Img3, Img3A), imageIsCompress(Img3A).
 
-
 Estos casos dan false
 
 pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
@@ -325,21 +323,207 @@ Probar imageCrop
 
 pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
 pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
-image(2,2,[A,B,C,D], Img2), imageCrop(Img2, 0,0,0,1,Img6),
-image(1,2,[A,B], Img7).
+image(2,2,[A,B,C,D], Img2), imageCrop(Img2, 0,0,0,1,Img2A),
+image(1,2,[A,B], Img2B).
 
-En el ejemplo anterior "Img6" = "Img7"
+En el ejemplo anterior "Img2A" = "Img2B"
 
-
-%!   este aún no lo he confirmado
 pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
 pixrgb(1,0,30,30,30,30,C), pixrgb(1,1,40,40,40,40,D),
 pixrgb(2,0,10,10,10,10,E), pixrgb(2,1,10,10,10,10,F),
-image(3,2,[A,B,C,D,E,F], Img3), imageCrop(Img3, 1,0,2,1, Img4),
+image(3,2,[A,B,C,D,E,F], Img3), imageCrop(Img3, 1,0,2,1, Img3A),
 pixrgb(0,0,30,30,30,30,A2), pixrgb(0,1,40,40,40,40,B2),
 pixrgb(1,0,10,10,10,10,C2), pixrgb(1,1,10,10,10,10,D2),
-image(2,2,[A2,B2,C2,D2], Img5).
+image(2,2,[A2,B2,C2,D2], Img3B).
 
+En el ejemplo anterior "Img3A" = "Img3B"
+
+pixhex(0,0,"#A0A0A0",10,A), pixhex(1,0,"#FF30A0", 10, B),
+pixhex(2,0,"#FFFF00",25,C), pixhex(3,0,"#FF30A0", 10, D),
+pixhex(4,0,"#000000",13,E), image(5, 1, [A,B,C,D,E], Img5),
+imageCrop(Img5,4,0,4,0,Img5A).
+
+En el ejemplo anterior solo hay una imagen con un píxel
+
+pixbit(0,0,1,10,A),pixbit(0,1,0,20,B), pixbit(1,0,0,20,C),
+pixbit(1,1,1,10,D), image(2,2,[A,B,C,D], Img2), imageCrop(Img2, 2,
+2, 2, 2, Img2A).
+
+En el ejemplo anterior la imagen debe ser vacia
+
+Probar imageRGBToHex
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(1,0,30,30,30,30,C), pixrgb(1,1,40,40,40,40,D),
+pixrgb(2,0,10,10,10,10,E), pixrgb(2,1,10,10,10,10,F),
+image(3,2,[A,B,C,D,E,F], Img3), imageToString(Img3, Str), write(Str),
+imageRGBToHex(Img3, Img3A), imageToString(Img3A, Str2), write(Str2).
+
+pixrgb(0,0,35,20,10,0,A), pixrgb(0,1,20,25,20,0,B),
+pixrgb(0,2,4,32,55,10,C), pixrgb(0,3,40,255,255,10,D),
+pixrgb(1,0,255,255,10,10,E), pixrgb(1,1,10,10,255,0,F),
+pixrgb(1,2,45,66,100,0,G), pixrgb(1,3,100,100,100,100,H),
+pixrgb(2,0,40,12,45,10,I), pixrgb(2,1,0,0,0,255,J),
+pixrgb(2,2,10,10,10,10,K), pixrgb(2,3,100,10,20,50,L),
+image(3,4,[A,B,C,D,E,F,G,H,I,J,K,L], Img8), imageToString(Img8, Str),
+write(Str), imageRGBToHex(Img8, Img8A), imageToString(Img8A, Str2),
+write(Str2).
+
+pixrgb(0,0,10,10,10,10,A),pixrgb(1,0,30,30,30,30,B),pixrgb(2,0,10,10,10,10,C),
+image(3,1,[A,B,C], Img6), imageToString(Img6, Str), write(Str),
+imageRGBToHex(Img6, Img6A), imageToString(Img6A, Str2), write(Str2).
+
+Probar imageToHistogram
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
+pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
+image(2,3,[A,B,C,D,E,F], Img3), imageToHistogram(Img3, Histograma).
+
+pixrgb(0,0,35,20,10,0,A), pixrgb(0,1,20,25,20,0,B),
+pixrgb(1,0,4,32,55,10,C), pixrgb(1,1,40,255,255,10,D),
+image(2,2,[A,B,C,D], Img8), imageRGBToHex(Img8, Img8A),
+imageToHistogram(Img8A, Histograma).
+
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
+pixbit(1,0,1,40,D), pixbit(1,1,1,10,E), pixbit(1,2,0,10,F),
+pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
+image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageToHistogram(Img1,
+Histograma).
+
+Probar imageRotate90
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
+pixrgb(1,1,50,50,50,50,E), pixrgb(1,2,60,60,60,60,F),
+image(2,3,[A,B,C,D,E,F], Img3),imageToString(Img3, Str), write(Str),
+imageRotate90(Img3, Img3A), imageToString(Img3A, Str2), write("\n"),
+write(Str2).
+
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
+pixbit(1,0,1,40,D), pixbit(1,1,1,10,E), pixbit(1,2,0,10,F),
+pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
+image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageToString(Img1, Str),
+write(Str), imageRotate90(Img1, Img1A), imageToString(Img1A, Str2),
+write("\n"), write(Str2).
+
+pixhex(0,0,"#A0A0A0",10,A), pixhex(1,0,"#FF30A0", 10, B),
+pixhex(2,0,"#FFFF00",25,C), pixhex(3,0,"#FF30A0", 10, D),
+pixhex(4,0,"#000000",13,E), image(5, 1, [A,B,C,D,E], Img5),
+imageToString(Img5, Str), write(Str), imageRotate90(Img5, Img5A),
+imageToString(Img5A, Str2), write("\n"), write(Str2).
+
+Probar imageCompress
+
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(1,0,1,30,C),
+pixbit(1,1,1,40,D), image(3,3,[A,B,C,D], Img4), imageCompress(Img4,
+Img4A).
+
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageCompress(Img2, Img2A).
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(1,0,30,30,30,30,C), pixrgb(1,1,40,40,40,40,D),
+image(2,2,[A,B,C,D], Img5), imageCompress(Img5, Img5A).
+
+Probar imageChangePixel
+
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(1,0,1,30,C),
+pixbit(1,1,1,40,D), image(3,3,[A,B,C,D], Img4), pixbit(1,0,0,33,C2),
+imageChangePixel(Img4, C2, Img4A).
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
+pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
+image(2,3,[A,B,C,D,E,F], Img3), pixhex(0,0,"#FFFFFF", 10, A2),
+imageChangePixel(Img3, A2, Img3A).
+
+En el ejemplo anterior "Img3" = "Img3A"
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
+pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
+image(2,3,[A,B,C,D,E,F], Img3), pixrgb(0,0,255,255,255, 10, A2),
+imageChangePixel(Img3, A2, Img3A).
+
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
+image(1,3,[A,B,C], Img8), pixbit(0,2,0,44,C2), imageChangePixel(Img8,
+C2, Img8A).
+
+Probar imageToString
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
+pixbit(1,0,1,40,D), pixbit(1,1,1,10,E), pixbit(1,2,0,10,F),
+pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
+image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageToString(Img1, Str),
+write(Str).
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(1,0,30,30,30,30,C), pixrgb(1,1,40,40,40,40,D),
+pixrgb(2,0,10,10,10,10,E), pixrgb(2,1,10,10,10,10,F),
+image(3,2,[A,B,C,D,E,F], Img3), imageCrop(Img3, 1,0,2,1, Img3A),
+imageToString(Img3A, Str), write(Str).
+
+pixrgb(0,0,35,20,10,0,A), pixrgb(0,1,20,25,20,0,B),
+pixrgb(0,2,4,32,55,10,C), pixrgb(0,3,40,255,255,10,D),
+pixrgb(1,0,255,255,10,10,E), pixrgb(1,1,10,10,255,0,F),
+pixrgb(1,2,45,66,100,0,G), pixrgb(1,3,100,100,100,100,H),
+pixrgb(2,0,40,12,45,10,I), pixrgb(2,1,0,0,0,255,J),
+pixrgb(2,2,10,10,10,10,K), pixrgb(2,3,100,10,20,50,L),
+image(3,4,[A,B,C,D,E,F,G,H,I,J,K,L], Img8),imageRGBToHex(Img8, Img8A),
+imageToString(Img8A, Str), write(Str).
+
+Probar imageDepthLayers
+
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
+pixbit(1,0,1,40,D), pixbit(1,1,1,10,E), pixbit(1,2,0,10,F),
+pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
+image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageDepthLayers(Img1, L).
+
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageDepthLayers(Img2, L).
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
+pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
+image(2,3,[A,B,C,D,E,F], Img3), imageDepthLayers(Img3, L).
+
+Probar imageDecompress
+pixbit(0,0,1,10,A), pixbit(0,1,0,20,B), pixbit(0,2,1,30,C),
+pixbit(1,0,1,40,D), pixbit(1,1,1,10,E), pixbit(1,2,0,10,F),
+pixbit(2,0,1,30,G), pixbit(2,1,0,20,H), pixbit(2,2,1,10,I),
+image(3,3,[A,B,C,D,E,F,G,H,I], Img1), imageCompress(Img1, Img1A),
+imageDecompress(Img1A, Img1B), imageToString(Img1B, Str),
+write(Str).
+
+pixhex(0,0,"#A0A0A0",10,A), pixhex(0,1,"#FF30A0", 10, B),
+pixhex(1,0,"#FFFF00", 25, C), pixhex(1,1,"#FF30A0", 10, D),
+image(2,2,[A,B,C,D], Img2), imageCompress(Img2,
+Img2A), imageDecompress(Img2A, Img2B), imageToString(Img2B, Str),
+write(Str).
+
+pixrgb(0,0,10,10,10,10,A), pixrgb(0,1,20,20,20,20,B),
+pixrgb(0,2,30,30,30,30,C), pixrgb(1,0,40,40,40,40,D),
+pixrgb(1,1,10,10,10,10,E), pixrgb(1,2,10,10,10,10,F),
+image(2,3,[A,B,C,D,E,F], Img3), imageCompress(Img3,
+Img3A), imageDecompress(Img3A, Img3B), imageToString(Img3B, Str),
+write(Str).
 
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
