@@ -131,7 +131,7 @@
 % ---------------------------------------------------------------------
 %
 % Regla
-% -------------CONSTRUCTOR y MODIFICADOR---------------------------
+% -------------CONSTRUCTOR y MODIFICADOR -------------------------
 %
 % Descripción: Predicado que define como es una imagen
 % Dominio: int X int X list X image
@@ -188,7 +188,7 @@ obtPixelesImage(Imagen , Pixeles):- image(_,_, Pixeles, Imagen).
 obtCoordImage(Imagen , Ancho, Largo):- image(Ancho,Largo, _, Imagen).
 
 
-% ---------MODIFICADORES Y OTROS PREDICADOS-----------------------------
+% ---------OTROS MODIFICADORES Y PREDICADOS-------------------------
 %
 % Descripción: Predicado que modifica CoordX y CoordY de un Pixel para
 % flipH, flipV, entre otros Dominio: Pixel X int X int X Pixel Tipo:

@@ -6,9 +6,9 @@
 % Clausuras
 % Dominio
 % CoordX, CoordY, Profundidad = integer >= 0
-% ColorR = 0 >= integer >= 255
-% ColorG = 0 >= integer >= 255
-% ColorB = 0 >= integer >= 255
+% ColorR = 0 <= integer <= 255
+% ColorG = 0 <= integer <= 255
+% ColorB = 0 <= integer <= 255
 % Pixel = pixrgb | pixbit | pixhex
 % Pixrgb = pixrgb
 %

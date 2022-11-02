@@ -88,7 +88,7 @@ obtProfundidadPixrgb(Pixrgb , Profundidad):-
 % Descripción: Predicado que forma una string con colores y profundidad
 % de un pixrgb
 % Dominio: Pixrgb X string
-% Tipo: Selector
+% Tipo: Otros predicados
 colorProfundidadPixrgb(Pixrgb, String):-
     esPixmap([Pixrgb]),
     obtProfundidadPixrgb(Pixrgb, D), obtColorPixrgb(Pixrgb, R,G,B),
