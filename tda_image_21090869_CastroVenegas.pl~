@@ -778,7 +778,7 @@ listaProfundidad([Cabeza | Cola], [NuevaCabeza | Cola2]):-
 % Descripción: Predicado que modifica el color de un Pixel a blanco
 % Dominio: Pixel X Pixel
 % Tipo: Otras funciones
-reemplazarPixelProfundidadBlanco(Pixel, Pixel2, Profundidad):-
+reemplazarPixelBlanco(Pixel, Pixel2, Profundidad):-
     esBitmap([Pixel]) ->
         obtCoordPixbit(Pixel, CoordX,CoordY), pixbit(CoordX,CoordY,1,Profundidad, Pixel2);
     esPixmap([Pixel]) ->
@@ -797,7 +797,7 @@ pixelesIgualProfundidad(Profundidad, [Cabeza | Cola], [NuevaCabeza | Cola2]):-
     (D = Profundidad) ->
         NuevaCabeza = Cabeza,
         pixelesIgualProfundidad(Profundidad, Cola, Cola2);
-        reemplazarPixelProfundidadBlanco(Cabeza, NuevaCabeza, Profundidad),
+        reemplazarPixelBlanco(Cabeza, NuevaCabeza, Profundidad),
         pixelesIgualProfundidad(Profundidad, Cola, Cola2).
 
 % Descripción: Predicado que crea la lista de imagenes diferenciadas por

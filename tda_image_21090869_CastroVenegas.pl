@@ -116,13 +116,65 @@
 % = 2)
 % imageDecompress{Imagen, Imagen2} (aridad = 2)
 %
+% Metas primarias
+% image
+% imageIsBitmap
+% imageIsHexmap
+% imageIsPixmap
+% imageIsCompress
+% imageFlipH
+% imageFlipV
+% imageCrop
+% imageRGBToHex
+% imageInvertColorRGB
+% histograma_formato
+% imageRotate90
+% imageCompress
+% imageToString
+% imageDepthLayers
+% imageDecompress
 %
-%
-% Metas primarias:
-%
-%
-% Metas secundarias:
-%
+% Metas secundarias
+% esImage
+% obtPixelesImage
+% obtCoordImage
+% cambiarCoordXY
+% flipH_formato
+% flipV_formato
+% rangoXY
+% crop_filtro
+% crop_formato
+% mayor
+% menor
+% numeroString
+% rgbHex
+% listRGB_HEX
+% stringRGB
+% formatoRGB_HEX
+% igualColor
+% eliminarElemento
+% listaEliminarColor
+% contarColor
+% colorPixel
+% rotate90_formato
+% stringNumero
+% hexRGB
+% listHEX_RGB
+% comprimirPixel
+% comprimirPixeles
+% pixelMasRepetido
+% igualCoordXY
+% changePixel
+% imageChangePixel
+% imageString_formato
+% obtProfundidad
+% listaEliminarProfundidad
+% listaProfundidad
+% reemplazarPixelProfundidadBlanco
+% pixelesIgualProfundidad
+% profundidad_formato
+% pixelDescomprimido
+% pixelesDescomprimidos
 %
 %
 % ----------------------REPRESENTACIÓN---------------------------------
