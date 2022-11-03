@@ -9,6 +9,7 @@ Seccion: 13310-0-A-1
 Fecha de inicio: - 
 
 Fecha de Entrega: 03 de Noviembre de 2022
+
 Descripción:
 Esta es la entrega del laboratorio 2 del curso de Paradigmas de Programación 
 impartido en la Universidad de Santiago. En este laboratorio se ve el paradigma
