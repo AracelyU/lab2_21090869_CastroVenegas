@@ -23,4 +23,5 @@ del repositorio y la carpeta con código fuente.
 Como ejecutar
 El archivo pruebas_21090869_CastroVenegas trae ejemplos para los requerimientos. Para ejecutar 
 estos ejemplos, primero se debe tener todos los TDAs en una carpeta junto con el archivo 
-pruebas_21090869_CastroVenegas, y luego consultar el archivo pruebas en la consola de SWI-Prolog y copiar los ejemplos para ver su resultado.
+pruebas_21090869_CastroVenegas, y luego consultar el archivo pruebas en SWI-Prolog y copiar los ejemplos 
+en la consola para ver su resultado.
