@@ -1,6 +1,4 @@
 
-
-% crear el módulo
 :- module(tda_pixrgb_comprimido_21090869_CastroVenegas, [pixrgb_comprimido/7,
                                               esPixmapComprimido/1,
                                               obtCoordPixrgbC/3,

@@ -110,7 +110,7 @@
 % = 3)
 % pixelesIgualProfundidad{Profundidad, [Cabeza | Cola], [NuevaCabeza |
 % Cola2]} (aridad = 3)
-% profundidad_formato{Imagen, [Profundidad | Cola], [NuevaCabeza |
+% profundidad_formato{Imagen, [Profundidad | ColaD], [NuevaCabeza |
 % Cola2]} (aridad = 3)
 % imageDepthLayers{Imagen, Lista} (aridad = 2)
 % pixelDescomprimido{Pixel, Pixel2} (aridad = 2)
@@ -1035,11 +1035,11 @@ pixelesIgualProfundidad(Profundidad, [Cabeza | Cola], [NuevaCabeza | Cola2]):-
 % meta secundaria: obtCoordImage, pixelesIgualProfundidad, image,
 % profundidad_formato
 profundidad_formato(_,[],[]).
-profundidad_formato(Imagen, [Profundidad | Cola], [NuevaCabeza | Cola2]):-
+profundidad_formato(Imagen, [Profundidad | ColaD], [NuevaCabeza | Cola2]):-
     obtCoordImage(Imagen, Ancho, Largo), obtPixelesImage(Imagen, Pixeles),
     pixelesIgualProfundidad(Profundidad, Pixeles, PixelesD),
     image(Ancho, Largo, PixelesD, NuevaCabeza),
-    profundidad_formato(Imagen, Cola, Cola2).
+    profundidad_formato(Imagen, ColaD, Cola2).
 
 % Descripción: Predicado que permite separar una imágen en capas en base a la profundidad en que se sitúan los pixeles
 % Dominio: image X list (image)

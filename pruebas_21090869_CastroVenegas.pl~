@@ -1,6 +1,3 @@
-
-
-% módulos utilizados
 :- use_module(tda_image_21090869_castrovenegas).
 :- use_module(tda_pixbit_21090869_CastroVenegas).
 :- use_module(tda_pixhex_21090869_CastroVenegas).

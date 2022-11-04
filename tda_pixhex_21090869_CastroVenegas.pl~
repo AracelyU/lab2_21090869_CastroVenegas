@@ -37,7 +37,7 @@
 % (int X int X string X int) el cual contiene CoordX,
 % CoordY, Hex y Profundidad
 % --------------------------------------------------------------------
-% clausuras
+%
 % Reglas
 %
 % ------------------ CONSTRUCTOR Y MODIFICADOR------------------------

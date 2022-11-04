@@ -1,5 +1,3 @@
-
-% crear el módulo
 :- module(tda_pixbit_comprimido_21090869_CastroVenegas, [pixbit_comprimido/5,
                                              esBitmapComprimido/1,
                                              obtCoordPixbitC/3, obtColorPixbitC/2,
@@ -42,6 +40,7 @@
 % ------------------ CONSTRUCTOR Y MODIFICADOR------------------------
 % Descripción: Predicado que define como es un pixbit_comprimido
 % Dominio: int X int X list [-1, Bit] X int X PixbitC
+% Tipo: Constructor y modificador
 pixbit_comprimido(CoordX, CoordY, Bit, Profundidad, [CoordX, CoordY, Bit, Profundidad]):-
     integer(CoordX),CoordX >= 0, integer(CoordY),CoordY >= 0, is_list(Bit), integer(Profundidad),Profundidad >= 0.
 
@@ -53,7 +52,6 @@ pixbit_comprimido(CoordX, CoordY, Bit, Profundidad, [CoordX, CoordY, Bit, Profun
 % Tipo: Pertenencia
 % Tipo de recursión: Cola, da resultado sin estados
 % pendientes.
-% meta secundaria: pixbit_comprimido
 esBitmapComprimido([]):- !, false.
 esBitmapComprimido([Cabeza | Cola]):-
     is_list(Cabeza), length(Cabeza, N), N == 4,
@@ -65,21 +63,20 @@ esBitmapComprimido([Cabeza | Cola]):-
 % Descripción: Predicado que obtiene la coordenadas (X,Y) de un
 % pixbit_comprimido
 % Dominio: PixbitC X int X int
-% meta secundaria: pixbit_comprimido
+% Tipo: Selector
 obtCoordPixbitC(PixbitC , CoordX, CoordY):-
     pixbit_comprimido(CoordX,CoordY,_,_, PixbitC).
 
 
 % Descripción: Predicado que obtiene la lista BitL de un
 % pixbit_comprimido
-% Dominio: PixbitC X list
-% meta secundaria: pixbit_comprimido
+% Dominio: PixbitC X list Tipo: Selector
 obtColorPixbitC(PixbitC , BitL):-
     pixbit_comprimido(_,_,BitL,_, PixbitC).
 
 % Descripción: Predicado que obtiene la profundidad de un pixbit
 % comprimido
 % Dominio: PixbitC X int
-% meta secundaria: pixbit_comprimido
+% Tipo: Selector
 obtProfundidadPixbitC(PixbitC , Profundidad):-
     pixbit_comprimido(_,_,_,Profundidad, PixbitC).

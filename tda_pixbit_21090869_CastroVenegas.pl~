@@ -50,7 +50,6 @@ pixbit(CoordX, CoordY, Bit, Profundidad, [CoordX, CoordY, Bit, Profundidad]):-
 % Dominio: Pixel (list)
 % Recorrido: Boleano, false si no es una lista de Pixbit
 % Tipo de recursión: Cola, da resultado sin estados pendientes.
-% meta secundaria: pixbit
 esBitmap([]).
 esBitmap([Cabeza | Cola]):-
     is_list(Cabeza), length(Cabeza, N), N == 4, pixbit(CoordX,CoordY,Bit,Profundidad, Cabeza),
@@ -60,19 +59,16 @@ esBitmap([Cabeza | Cola]):-
 % -------------------------SELECTORES---------------------------------------
 % Descripción: Predicado que obtiene la coordenadas (X,Y) de un pixbit
 % Dominio: Pixbit X int X int
-% meta secundaria: pixbit
 obtCoordPixbit(Pixbit , CoordX, CoordY):-
     pixbit(CoordX,CoordY,_,_, Pixbit).
 
 % Descripción: Predicado que obtiene el bit de un pixbit
 % Dominio: Pixbit X int
-% meta secundaria: pixbit
 obtColorPixbit(Pixbit , Bit):-
     pixbit(_,_,Bit,_, Pixbit).
 
 % Descripción: Predicado que obtiene la profundidad de un pixbit
 % Dominio: Pixbit X int
-% meta secundaria: pixbit
 obtProfundidadPixbit(Pixbit , Profundidad):-
     pixbit(_,_,_,Profundidad, Pixbit).
 

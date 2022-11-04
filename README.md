@@ -1,12 +1,12 @@
 # lab2_21090869_CastroVenegas
 
-Laboratorio 2 Paradigmas de Programación: Programación Funcional
+Laboratorio 2 Paradigmas de Programación: Programación Lógica
 
 Autor: Aracely Castro Venegas
 
 Seccion: 13310-0-A-1
 
-Fecha de inicio: - 
+Fecha de inicio: 01 de octubre de 2022
 
 Fecha de Entrega: 03 de Noviembre de 2022
 

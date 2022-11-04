@@ -1,5 +1,3 @@
-
-% crear el módulo
 :- module(tda_pixhex_comprimido_21090869_CastroVenegas, [
                                               pixhex_comprimido/5,
                                               esHexmapComprimido/1,
