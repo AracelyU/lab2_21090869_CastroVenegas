@@ -21,6 +21,7 @@ Se necesita del programa SWI-Prolog 8.4.3 o superior para poder ejecutar los có
 del repositorio y la carpeta con código fuente.
 
 Como ejecutar
+
 El archivo pruebas_21090869_CastroVenegas trae ejemplos para los requerimientos. Para ejecutar 
 estos ejemplos, primero se debe tener todos los TDAs en una carpeta junto con el archivo 
 pruebas_21090869_CastroVenegas, y luego consultar el archivo pruebas en SWI-Prolog y copiar los ejemplos 
